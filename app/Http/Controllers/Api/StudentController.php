@@ -34,6 +34,15 @@ class StudentController extends Controller
         ]);
     }
 
+    public function show($user_id) {
+        $student = Student::find($user_id);
+
+        return response()->json([
+            'success' => true,
+            'user' => $student,
+        ]);
+    }
+
     public function update($account_id, Request $req) {
         $account = Account::find($account_id);
         $student = Student::find($account->user_id);

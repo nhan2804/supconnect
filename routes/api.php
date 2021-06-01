@@ -21,9 +21,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('login', 'App\Http\Controllers\Api\AuthController@login');
 
 Route::prefix('student')->group(function() {
-    Route::get('/timeTable', 'App\Http\Controllers\Api\TimeTableController@index');
+    Route::get('/timetable/user/{user_id}', 'App\Http\Controllers\Api\TimeTableController@timetableUser');
+    Route::get('/timetable', 'App\Http\Controllers\Api\TimeTableController@index');
 
-    Route::get('/{account_id}', 'App\Http\Controllers\Api\StudentController@index');
+    Route::get('/{account_id}', 'App\Http\Controllers\Api\StudentController@show');
     Route::put('/{account_id}', 'App\Http\Controllers\Api\StudentController@update');
 });
 
