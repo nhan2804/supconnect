@@ -10,6 +10,8 @@ use Hash;
 use App\Models\Account;
 use App\Models\Student;
 use App\Models\Account_Role;
+use App\Models\Class_List;
+
 
 class StudentController extends Controller
 {
@@ -28,6 +30,8 @@ class StudentController extends Controller
             $account->avatar = $student->avatar;
         }
 
+        $account->class = Class_List::find($account->class_id)->class_name;
+
         return response()->json([
             'success' => true,
             'user' => $account,
@@ -36,6 +40,7 @@ class StudentController extends Controller
 
     public function show($user_id) {
         $student = Student::find($user_id);
+        $student->class = Class_List::find($student->class_id)->class_name;
 
         return response()->json([
             'success' => true,
@@ -44,10 +49,15 @@ class StudentController extends Controller
     }
 
     public function update($account_id, Request $req) {
-        $account = Account::find($account_id);
-        $student = Student::find($account->user_id);
-        $student->update($req->all());
+        $student = Student::find($account_id);
+        if($student) {
+            $student->update($req->all());
+            return $this->show($account_id);
+        }
+        return response()->json([
+            'success' => true,
+            'message' => 'student_id is not valid'
+        ]);
 
-        return $this->index($account_id);
     }
 }

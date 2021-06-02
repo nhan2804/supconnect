@@ -10,6 +10,7 @@ use Hash;
 use App\Models\Account;
 use App\Models\Student;
 use App\Models\Account_Role;
+use App\Models\Class_List;
 
 
 class AuthController extends Controller
@@ -32,6 +33,7 @@ class AuthController extends Controller
             $account->classId = $student->class_id;
             $account->email = $student->email;
             $account->avatar = $student->avatar;
+            $account->class = Class_List::find($account->classId)->class_name;
         }
 
         return response()->json([
