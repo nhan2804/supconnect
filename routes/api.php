@@ -28,7 +28,9 @@ Route::prefix('student')->group(function() {
     Route::put('/{account_id}', 'App\Http\Controllers\Api\StudentController@update');
 });
 
-Route::get('test', 'App\Http\Controllers\Api\AuthController@test');
+Route::get('test', function() {
+    echo md5("12345678");
+});
 
 
 
