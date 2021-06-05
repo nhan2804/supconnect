@@ -11,6 +11,7 @@ use App\Models\Student;
 use App\Models\Lecturer;
 use App\Models\TimeTable;
 use App\Models\Subject_List;
+use App\Models\Lecturer_Degree_Type;
 use App\Models\Student_Of_Subject_Class;
 
 class TimeTableController extends Controller
@@ -42,8 +43,9 @@ class TimeTableController extends Controller
 
         foreach($timetables as $timetable) {
             $lecturer = Lecturer::find($timetable->lecturer_id);
-            $timetable->lecturer = $lecturer->degree .' ' .$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer; 
-            $timetable->subject_name = Subject_List::find($timetable->subject_id)->subject_name; 
+            $lecturer_degree = Lecturer_Degree_Type::find($lecturer->degree);
+            $timetable->lecturer = $lecturer_degree->abbreviation .' ' .$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer;
+            $timetable->subject_name = Subject_List::find($timetable->subject_id)->subject_name;
         }
 
         return response()->json([
