@@ -23,9 +23,10 @@ class AuthController extends Controller
         $role = Account_Role::where('account_id', Auth::user()->account_id)->first()->role_id;
         if($role == 1) {
             $student = Student::where('account_id', $account->account_id)->first();
+            $account->user_id = $student->student_id;
             $account->firstName = $student->first_name;
             $account->lastName = $student->last_name;
-            $account->age = $student->age;
+            $account->date_of_birth = $student->date_of_birth;
             $account->phoneNumber = $student->phone_number;
             $account->startYear = $student->start_year;
             $account->classId = $student->class_id;
