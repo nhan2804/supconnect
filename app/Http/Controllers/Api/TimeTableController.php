@@ -31,9 +31,12 @@ class TimeTableController extends Controller
     }
 
     public function timetableUser($user_id) {
+        $now = date('Y-m-d');
         $timetables = TimeTable::join('student_of_subject_class', 'student_of_subject_class.subject_class', 'timetable.subject_class_id')
             ->join('subject_class', 'subject_class.subject_class_id', 'timetable.subject_class_id')
             ->where('student_of_subject_class.student_id', $user_id)
+            ->where('subject_class.date_start', '<=', $now)
+            ->where('subject_class.date_end', '>=', $now)
             ->select('timetable.timetable_id', 'timetable.day_of_week', 'timetable.lesson', 'timetable.classroom',
             'student_of_subject_class.student_id', 'subject_class.subject_id', 'subject_class.lecturer_id' )
             ->orderBy('timetable.day_of_week')
