@@ -18,12 +18,12 @@ class AuthController extends Controller
     public function login(Request $req) {
 
         $account = Account::where(['username' => $req->username, 'password' => md5($req->password)])->first();
-        Auth::login($account);
         $account->save();
+        Auth::login($account);
         $role = Account_Role::where('account_id', Auth::user()->account_id)->first()->role_id;
         if($role == 1) {
             $student = Student::where('account_id', $account->account_id)->first();
-            $account->user_id = $student->student_id;
+            $account->studentId = $student->student_id;
             $account->firstName = $student->first_name;
             $account->lastName = $student->last_name;
             $account->date_of_birth = $student->date_of_birth;
