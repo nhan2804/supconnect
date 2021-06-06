@@ -27,7 +27,7 @@ class StudentController extends Controller
             $student = Student::find($account->user_id);
             $account->firstName = $student->first_name;
             $account->lastName = $student->last_name;
-            $account->age = $student->age;
+            $account->date_of_birth = $student->date_of_birth;
             $account->phoneNumber = $student->phone_number;
             $account->startYear = $student->start_year;
             $account->classId = $student->class_id;
@@ -44,7 +44,7 @@ class StudentController extends Controller
     }
 
     public function show($user_id) {
-        $student = Student::where('account_id', $user_id)->first();
+        $student = Student::where('student_id', $user_id)->first();
         $student->class = Class_List::find($student->class_id)->class_name;
 
         return response()->json([
@@ -115,7 +115,7 @@ class StudentController extends Controller
     }
 
     public function update($account_id, Request $req) {
-        $student = Student::where('account_id', $account_id)->first();
+        $student = Student::where('student_id', $account_id)->first();
         if($student) {
             $student->update($req->all());
             return $this->show($account_id);

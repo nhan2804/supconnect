@@ -24,7 +24,9 @@ Route::prefix('student')->group(function() {
     Route::get('/timetable/user/{user_id}', 'App\Http\Controllers\Api\TimeTableController@timetableUser');
     Route::get('/timetable', 'App\Http\Controllers\Api\TimeTableController@index');
 
-    Route::get('/assignment/{student_id}', 'App\Http\Controllers\Api\AssignmentController@studentAssignment');
+    Route::get('/assignment/list/{student_id}', 'App\Http\Controllers\Api\AssignmentController@studentAssignment');
+
+    Route::get('/assignment/{student_id}', 'App\Http\Controllers\Api\AssignmentController@show');
 
     Route::get('/announcement', 'App\Http\Controllers\Api\AnnouncementController@index');
     Route::get('/announcement/{id}', 'App\Http\Controllers\Api\AnnouncementController@show');

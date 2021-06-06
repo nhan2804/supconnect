@@ -41,7 +41,11 @@ class AssignmentController extends Controller
      */
     public function show($id)
     {
-        //
+        $assignment = Assignment::where('assignment_id', $id)->get();
+        return response()->json([
+            'success' => true,
+            'assignments' => $assignment
+        ]);
     }
 
     public function studentAssignment($student_id) {

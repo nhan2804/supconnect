@@ -26,7 +26,7 @@ class AuthController extends Controller
             $account->studentId = $student->student_id;
             $account->firstName = $student->first_name;
             $account->lastName = $student->last_name;
-            $account->age = $student->age;
+            $account->dateOfBirth = $student->date_of_birth;
             $account->phoneNumber = $student->phone_number;
             $account->startYear = $student->start_year;
             $account->classId = $student->class_id;
