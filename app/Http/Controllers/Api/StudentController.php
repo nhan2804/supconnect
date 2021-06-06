@@ -25,6 +25,7 @@ class StudentController extends Controller
         $role = Account_Role::where('account_id', $account->account_id)->first()->role_id;
         if($role == 1) {
             $student = Student::find($account->user_id);
+            $account->user_id = $student->student_id;
             $account->firstName = $student->first_name;
             $account->lastName = $student->last_name;
             $account->date_of_birth = $student->date_of_birth;
