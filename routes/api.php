@@ -41,7 +41,7 @@ Route::post('login', 'App\Http\Controllers\Api\AuthController@login');
 Route::prefix('student')->group(function () {
     Route::get('/timetable/user/{user_id}', 'App\Http\Controllers\Api\TimeTableController@timetableUser');
     Route::get('/timetable', 'App\Http\Controllers\Api\TimeTableController@index');
-  
+
     Route::get('/assignment/list/{student_id}', 'App\Http\Controllers\Api\AssignmentController@studentAssignment');
     Route::get('/assignment/{student_id}', 'App\Http\Controllers\Api\AssignmentController@show');
 
@@ -52,6 +52,9 @@ Route::prefix('student')->group(function () {
 
     Route::get('/{account_id}', 'App\Http\Controllers\Api\StudentController@show');
     Route::put('/{account_id}', 'App\Http\Controllers\Api\StudentController@update');
+
+    Route::get('/leavenotice/list/{student_id}','App\Http\Controllers\Api\LeaveNoticeController@studentLeaveNotice');
+    Route::get('/leavenotice/{student_id}', 'App\Http\Controllers\Api\LeaveNoticeController@show');
 
 });
 
