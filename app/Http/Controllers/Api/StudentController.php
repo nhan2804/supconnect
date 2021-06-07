@@ -54,16 +54,25 @@ class StudentController extends Controller
         ]);
     }
 
-    public function gradeStudent($student_id) {
+    public function gradeStudent($student_id, Request $req) {
 
-        $now = date('Y-m-d');
-
-        $subjectResults = Student_Of_Subject_Class::join('subject_class', 'subject_class.subject_class_id', 'student_of_subject_class.subject_class' )
-                                    ->where('subject_class.date_start', '<=', $now)
-                                    ->where('subject_class.date_end', '>=', $now)
-                                    ->where('student_id', $student_id)  
-                                    ->select('student_of_subject_class.junction_id', 'student_of_subject_class.subject_class', 'subject_class.subject_id')
-                                    ->get();
+        $now = date('Y-m-d');   
+        if($req->semester == '' || $req->school_year == '') {
+            $subjectResults = Student_Of_Subject_Class::join('subject_class', 'subject_class.subject_class_id', 'student_of_subject_class.subject_class' )
+                ->where('subject_class.date_start', '<=', $now)
+                ->where('subject_class.date_end', '>=', $now)
+                ->where('student_id', $student_id)  
+                ->select('student_of_subject_class.junction_id', 'student_of_subject_class.subject_class', 'subject_class.subject_id')
+                ->get();
+        } else {
+            $subjectResults = Student_Of_Subject_Class::join('subject_class', 'subject_class.subject_class_id', 'student_of_subject_class.subject_class' )
+            ->where('subject_class.semester', $req->semester)
+            ->where('subject_class.school_year', $req->school_year)
+            ->where('student_id', $student_id)  
+            ->select('student_of_subject_class.junction_id', 'student_of_subject_class.subject_class', 'subject_class.subject_id')
+            ->get();
+        }
+        
         $marks = [];
         foreach($subjectResults as $class) {
 
