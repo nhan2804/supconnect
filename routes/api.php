@@ -37,6 +37,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 
 Route::post('login', 'App\Http\Controllers\Api\AuthController@login');
+Route::get('/logout', 'App\Http\Controllers\Api\AuthController@logout');
 
 Route::prefix('student')->group(function () {
     Route::get('/timetable/user/{user_id}', 'App\Http\Controllers\Api\TimeTableController@timetableUser');
