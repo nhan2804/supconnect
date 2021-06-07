@@ -57,7 +57,7 @@ class AssignmentController extends Controller
             ->where('student_of_subject_class.student_id', $student_id)
             ->where('subject_class.date_start', '<=', $now)
             ->where('subject_class.date_end', '>=', $now)
-            ->select('assignment.*', 'subject_class.subject_class_id as class_name')
+            ->select('assignment.*', 'subject_class.subject_class_name as class_name')
             ->get();
 
         $result = (array) Arr::sort($assignments, function ($assignment) {
