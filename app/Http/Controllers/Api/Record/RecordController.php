@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\Payment;
+namespace App\Http\Controllers\Api\Record;
 
 use App\Http\Controllers\Controller;
-use App\Models\Payment\Payment;
-use App\Models\Payment\PaymentDetail;
+use App\Models\Record\RecordDetail;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use DB;
 
-class PaymentController extends Controller
+class RecordController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,7 +16,15 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        //
+        $id_sv = Student::where('account_id', 4)->first()->student_id;
+
+        RecordDetail::create([
+            'record_id' => 1,
+            'student_id' => $id_sv,
+            'is_attend' => 1,
+            'leave_of_absence_letter' => 1,
+            'reason' => 'None with' . $i
+        ]);
     }
 
     /**
@@ -37,26 +43,9 @@ class PaymentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $r)
+    public function store(Request $request)
     {
-        $id_sv = Student::where('account_id', 4)->first()->student_id;
-        $new = new Payment;
-        $new->user_id = $id_sv;
-        $new->transaction_type_id = 2;
-        $new->date = date('Y-m-d h:i:s');
-        $new->amount = $r->amount;
-
-        $new->save();
-        $new_d = new PaymentDetail;
-
-        $new_d->transaction_history_id =
-            DB::getPdo()->lastInsertId();
-        $new_d->transaction_category_id = $r->transaction_category_id;
-        $new_d->amount = $r->amount;
-        $new_d->description = $r->description;
-
-        if ($new_d->save()) return response()->json(['message' => "Thành công"], 200);
-        return response()->json(['message' => "Có lỗi xảy ra"], 500);
+        //
     }
 
     /**
@@ -67,8 +56,7 @@ class PaymentController extends Controller
      */
     public function show($id)
     {
-        $pay = Payment::with(['detail', 'type'])->find($id);
-        return response()->json($pay, 200);
+        //
     }
 
     /**
