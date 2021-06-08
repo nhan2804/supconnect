@@ -20,15 +20,16 @@ class AuthController extends Controller
 
         // return Auth::user();
         $account = Account::where(['username' => $req->username, 'password' => md5($req->password)])->first();
+
         Auth::login($account);
-        // $account->save();
-        // return Auth::user();
+
         $role = Account_Role::where('account_id', Auth::user()->account_id)->first()->role_id;
         if ($role == 1) {
             $student = Student::where('account_id', $account->account_id)->first();
+            $account->studentId = $student->student_id;
             $account->firstName = $student->first_name;
             $account->lastName = $student->last_name;
-            $account->age = $student->age;
+            $account->dateOfBirth = $student->date_of_birth;
             $account->phoneNumber = $student->phone_number;
             $account->startYear = $student->start_year;
             $account->classId = $student->class_id;
@@ -40,6 +41,14 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'user' => $account,
+        ]);
+    }
+
+    public function logout() {
+        Auth::logout();
+        return response()->json([
+            'success' => true,
+            'message' => 'logout success'
         ]);
     }
 }

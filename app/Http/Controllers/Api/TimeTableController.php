@@ -11,6 +11,7 @@ use App\Models\Student;
 use App\Models\Lecturer;
 use App\Models\TimeTable;
 use App\Models\Subject_List;
+use App\Models\Lecturer_Degree_Type;
 use App\Models\Student_Of_Subject_Class;
 
 class TimeTableController extends Controller
@@ -31,9 +32,12 @@ class TimeTableController extends Controller
     }
 
     public function timetableUser($user_id) {
+        $now = date('Y-m-d');
         $timetables = TimeTable::join('student_of_subject_class', 'student_of_subject_class.subject_class', 'timetable.subject_class_id')
             ->join('subject_class', 'subject_class.subject_class_id', 'timetable.subject_class_id')
             ->where('student_of_subject_class.student_id', $user_id)
+            ->where('subject_class.date_start', '<=', $now)
+            ->where('subject_class.date_end', '>=', $now)
             ->select('timetable.timetable_id', 'timetable.day_of_week', 'timetable.lesson', 'timetable.classroom',
             'student_of_subject_class.student_id', 'subject_class.subject_id', 'subject_class.lecturer_id' )
             ->orderBy('timetable.day_of_week')
@@ -42,8 +46,9 @@ class TimeTableController extends Controller
 
         foreach($timetables as $timetable) {
             $lecturer = Lecturer::find($timetable->lecturer_id);
-            $timetable->lecturer = $lecturer->degree .' ' .$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer; 
-            $timetable->subject_name = Subject_List::find($timetable->subject_id)->subject_name; 
+            $lecturer_degree = Lecturer_Degree_Type::find($lecturer->degree);
+            $timetable->lecturer = $lecturer_degree->abbreviation .' ' .$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer;
+            $timetable->subject_name = Subject_List::find($timetable->subject_id)->subject_name;
         }
 
         return response()->json([
