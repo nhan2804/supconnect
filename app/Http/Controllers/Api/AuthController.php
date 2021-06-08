@@ -15,13 +15,16 @@ use App\Models\Class_List;
 
 class AuthController extends Controller
 {
-    public function login(Request $req) {
+    public function login(Request $req)
+    {
 
+        // return Auth::user();
         $account = Account::where(['username' => $req->username, 'password' => md5($req->password)])->first();
         Auth::login($account);
-        $account->save();
+        // $account->save();
+        // return Auth::user();
         $role = Account_Role::where('account_id', Auth::user()->account_id)->first()->role_id;
-        if($role == 1) {
+        if ($role == 1) {
             $student = Student::where('account_id', $account->account_id)->first();
             $account->firstName = $student->first_name;
             $account->lastName = $student->last_name;
@@ -36,7 +39,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'user' => Auth::user(),
+            'user' => $account,
         ]);
     }
 }

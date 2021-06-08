@@ -18,10 +18,11 @@ class TargetController extends Controller
      */
     public function index()
     {
-
+        $now = date('Y-m-d h:i:s');
         $id_sv = Student::where('account_id', 4)->first()->student_id;
         $target = DB::table('subject_class')->join('student_of_subject_class', 'student_of_subject_class.subject_class', 'subject_class.subject_class_id')
-            ->LeftJoin('target', 'target.subject_class_id', 'student_of_subject_class.subject_class')->where('student_of_subject_class.student_id', $id_sv)->get();
+            ->LeftJoin('target', 'target.subject_class_id', 'student_of_subject_class.subject_class')->where('student_of_subject_class.student_id', $id_sv)->whereDate('time_start', '<=', $now)
+            ->whereDate('time_end', '>=', $now)->get();
         return $target;
     }
 
@@ -32,7 +33,11 @@ class TargetController extends Controller
      */
     public function create()
     {
-        //
+        $now = date('Y-m-d h:i:s');
+        $id_sv = Student::where('account_id', 4)->first()->student_id;
+        return $list_target = DB::table('subject_class')->join('student_of_subject_class', 'student_of_subject_class.subject_class', 'subject_class.subject_class_id')
+            ->LeftJoin('target', 'target.subject_class_id', 'student_of_subject_class.subject_class')->where('student_of_subject_class.student_id', $id_sv)->whereDate('time_start', '<=', $now)
+            ->whereDate('time_end', '>=', $now)->where('target.target_id', '=', null)->get();
     }
 
     /**
@@ -59,8 +64,12 @@ class TargetController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
+
     {
-        //
+        return "chưa có AI";
+        // DB::table('subject_class')->join('student_of_subject_class', 'student_of_subject_class.subject_class', 'subject_class.subject_class_id')
+        //     ->LeftJoin('target', 'target.subject_class_id', 'student_of_subject_class.subject_class')->where('student_of_subject_class.student_id', $id_sv)->whereDate('time_start', '<=', $now)
+        //     ->whereDate('time_end', '>=', $now)->where('target.target_id', '=', null)->get();
     }
 
     /**

@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\Chat\ChatController;
 use App\Http\Controllers\Api\Chat\ChatDetailController;
 use App\Http\Controllers\Api\Target\TargetController;
 use App\Http\Controllers\Api\Payment\PaymentController;
+use App\Http\Controllers\Api\Record\RecordController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -29,6 +31,7 @@ Route::resource('chat', ChatController::class);
 Route::resource('chat-details', ChatDetailController::class);
 Route::resource('target', TargetController::class);
 Route::resource('payment', PaymentController::class);
+Route::resource('record', RecordController::class);
 //endchat
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
