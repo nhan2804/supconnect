@@ -46,13 +46,12 @@ class ChatController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $r)
+    public function store(Request $req)
     {
         // Auth::user()->account_id chưa có login
-        $id_user = 4;
         $new = new Chat;
-        $new->user_1 = $id_user;
-        $new->user_2 = $r->id;
+        $new->user_1 = $req->user_id1;
+        $new->user_2 = $req->id;
         if ($new->save()) return response()->json(['message' => "Tạo thành công"], 200);
         return response()->json(['message' => "Có lỗi xảy ra, vui lòng thử lại"], 500);
     }

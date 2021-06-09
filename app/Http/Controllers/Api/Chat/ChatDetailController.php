@@ -35,14 +35,14 @@ class ChatDetailController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $r)
+    public function store(Request $req)
     {
         //
         // return "dssss";
         $new = new ChatDetail;
-        $new->chat_history_id = $r->id_chat;
-        $new->sender_id = 8;
-        $new->message = $r->message;
+        $new->chat_history_id = $req->id_chat;
+        $new->sender_id = $req->sender_id;
+        $new->message = $req->message;
         $new->time =  date("Y-m-d h:i:s");
 
         if (!$new->save()) return response()->json(['message' => "Error"], 500);

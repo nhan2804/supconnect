@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Auth;
 use App\Models\Account;
 use App\Models\Student;
 use App\Models\Account_Role;
 use App\Models\Class_List;
 use App\Models\User;
-use JWTAuth;
 use Hash;
 use Session;
 use DB;
@@ -20,7 +20,6 @@ class AuthController extends Controller
 {
     public function login(Request $req)
     {
-
 
         // $u = new Account();
         // $u->username = 'nhan';
@@ -33,44 +32,44 @@ class AuthController extends Controller
         // return $input;
 
 
-        $input = $req->only(
-            'username',
-            'password'
-        );
+        // $input = $req->only(
+        //     'username',
+        //     'password'
+        // );
 
-        $token = null;
-        $token = JWTAuth::attempt($input);
-        DB::enableQueryLog();
-        // return $token;
-        if (!$token) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Tên đăng nhập hoặc mật khẩu không chính xác',
-            ], 401);
-        }
-        Auth::user();
-        return DB::getQueryLog();
+        // $token = null;
+        // $token = JWTAuth::attempt($input);
+        // DB::enableQueryLog();
+        // // return $token;
+        // if (!$token) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Tên đăng nhập hoặc mật khẩu không chính xác',
+        //     ], 401);
+        // }
+        // Auth::user();
+        // return DB::getQueryLog();
 
-        return response()->json(
-            [
-                'status' => true,
-                'token' => $token,
-                'user' => auth()->user()->password
-            ],
-            200
-        );
+        // return response()->json(
+        //     [
+        //         'status' => true,
+        //         'token' => $token,
+        //         'user' => auth()->user()->password
+        //     ],
+        //     200
+        // );
 
         // return auth()->user();
-        $account = Account::where(['username' => auth()->user()->username])->first();
+        $account = Account::where(['username' => $req->username])->first();
         // Auth::login($account);
 
-        $role = Account_Role::where('account_id', auth()->user()->account_id)->first()->role_id;
+        $role = Account_Role::where('account_id', $account->account_id)->first()->role_id;
         if ($role == 1) {
             $student = Student::where('account_id', $account->account_id)->first();
             $account->firstName = $student->first_name;
             $account->lastName = $student->last_name;
             $account->age = $student->age;
-            $account->id_sv = $student->student_id;
+            $account->studentId = $student->student_id;
             $account->phoneNumber = $student->phone_number;
             $account->startYear = $student->start_year;
             $account->classId = $student->class_id;
@@ -81,7 +80,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => true,
-            'token' => $token,
+            // 'token' => $token,
             'user' => $account
         ], 200);
     }
