@@ -26,12 +26,14 @@ header('Access-Control-Allow-Methods: GET, POST');
 
 header("Access-Control-Allow-Headers: X-Requested-With");
 // Chat
-Route::resource('todo', TodoController::class);
-Route::resource('chat', ChatController::class);
-Route::resource('chat-details', ChatDetailController::class);
-Route::resource('target', TargetController::class);
-Route::resource('payment', PaymentController::class);
-Route::resource('record', RecordController::class);
+Route::middleware('auth.jwt')->group(function () {
+    Route::resource('todo', TodoController::class);
+    Route::resource('chat', ChatController::class);
+    Route::resource('chat-details', ChatDetailController::class);
+    Route::resource('target', TargetController::class);
+    Route::resource('payment', PaymentController::class);
+    Route::resource('record', RecordController::class);
+});
 //endchat
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

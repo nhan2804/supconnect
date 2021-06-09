@@ -6,35 +6,26 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Account extends Authenticatable
+class Account extends Authenticatable implements JWTSubject
 {
     use HasFactory;
+    use Notifiable;
     protected $table = 'account';
     protected $primaryKey = 'account_id';
     public $timestamps  = false;
 
-    public function getAuthIdentifierName() {
-        
-    }
+    protected $fillable = [
+        'username', 'password',
+    ];
 
-    public function getAuthIdentifier() {
-        
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
     }
-
-    public function getAuthPassword() {
-        
-    }
-
-    public function getRememberToken() {
-        
-    }
-
-    public function setRememberToken($value) {
-        
-    }
-
-    public function getRememberTokenName() {
-        
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }
