@@ -8,7 +8,6 @@ use App\Models\Target\Target;
 use App\Models\User;
 use Illuminate\Http\Request;
 use DB;
-use Auth;
 
 class TargetController extends Controller
 {
@@ -19,7 +18,6 @@ class TargetController extends Controller
      */
     public function index()
     {
-        return Auth::user();
         $now = date('Y-m-d h:i:s');
         $id_sv = Student::where('account_id', 4)->first()->student_id;
         $target = DB::table('subject_class')->join('student_of_subject_class', 'student_of_subject_class.subject_class', 'subject_class.subject_class_id')

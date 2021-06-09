@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api\Chat;
 
 use App\Http\Controllers\Controller;
-use App\Models\ChatDetail;
 use Illuminate\Http\Request;
 use DB;
+use App\Models\ChatDetail;
+use App\Models\Chat;
 
 class ChatDetailController extends Controller
 {
@@ -35,18 +36,39 @@ class ChatDetailController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $r)
+    public function store(Request $req)
     {
-        //
-        // return "dssss";
         $new = new ChatDetail;
-        $new->chat_history_id = $r->id_chat;
-        $new->sender_id = 8;
-        $new->message = $r->message;
+        $new->chat_history_id = $req->id_chat;
+        $new->sender_id = $req->sender_id;
+        $new->message = $req->message;
         $new->time =  date("Y-m-d h:i:s");
 
         if (!$new->save()) return response()->json(['message' => "Error"], 500);
-        return response()->json($new, 400);
+        return response()->json($new, 200);
+    }
+
+    function checkIsValidRoom($user_1, $user_2) {
+        $room = Chat::where([
+            ['user_1', '=', $user_1 ],
+            ['user_2', '=', $user_2 ]
+        ])->orWhere([
+            ['user_1', '=', $user_2 ],
+            ['user_2', '=', $user_1 ]
+        ])->first();
+        $isHasRoom = false;
+        if(isset($room)) {
+            $isHasRoom = true;
+            return $room->chat_history_id;
+        }
+
+        if(!$isHasRoom) {
+            $room = new Chat();
+            $room->user_1 = $user_1;
+            $room->user_2 = $user_2;
+            $room->save();
+            return $room->id;
+        }
     }
 
     /**
@@ -55,11 +77,16 @@ class ChatDetailController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $req)
     {
-        // return $id;
-        // DB::enableQueryLog();
-        $detail = ChatDetail::where('chat_history_id', $id)->with(['user'])->get();
+
+        if($id == 0) {
+            $id = $this->checkIsValidRoom($req->user_1, $req->user_2); 
+        }
+        $details = ChatDetail::where('chat_history_id', $id)->get();
+        foreach($details as $detail) {
+            
+        }
         return response()->json($detail, 200);
         // dd(DB::getQueryLog());
     }

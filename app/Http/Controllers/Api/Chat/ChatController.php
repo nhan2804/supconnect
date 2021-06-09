@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\Chat;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Chat;
+use App\Models\Student;
+use App\Models\Lecture;
 use App\Models\ChatDetail;
 use Illuminate\Support\Facades\Auth;
 use DB;
@@ -17,17 +19,39 @@ class ChatController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function index()
+    public function index(Request $req)
     {
         // Auth::user()->account_id chưa có login
-        $id_user = 4;
-        // DB::enableQueryLog(); // Enable query log
-        $chats = Chat::where('user_1', $id_user)->with(['user'])->paginate(20);
-        // Your Eloquent query executed by using get()
+        //  DB::enableQueryLog(); // Enable query log
+        $chats = Chat::where('user_1', $req->input('user_id'))
+                        ->orWhere('user_2', $req->input('user_id'))
+                        ->get();
+        
+        foreach($chats as $chat) {
+            $message = ChatDetail::where('chat_history_id', $chat->chat_history_id)
+            ->orderBy('chat_history_detail_id', 'desc')
+            ->first();
+            $chat->message = $message->message;
+            $chat->messageTime = $message->time;
+            if($req->input('user_id') == $chat->user_1) {
+                $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
+                if($name == '') {
+                    $name = Lecture::find($chat->user_2)->first_name_lecturer .' ' .Student::find($chat->user_2)->last_name_lecturer;
+                }
+            } else {
+                $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
+                if($name == '') {
+                    $name = Lecture::find($chat->user_1)->first_name_lecturer .' ' .Student::find($chat->user_1)->last_name_lecturer;
+                }
+            }
 
-        // dd(DB::getQueryLog()); // Show results of log
+            $chat->name = $name;
+        }
 
-        return response()->json($chats, 200);
+        return response()->json([
+            'success' => true,
+            'chat' => $chats
+        ], 200);
     }
 
     /**
@@ -46,13 +70,12 @@ class ChatController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $r)
+    public function store(Request $req)
     {
         // Auth::user()->account_id chưa có login
-        $id_user = 4;
         $new = new Chat;
-        $new->user_1 = $id_user;
-        $new->user_2 = $r->id;
+        $new->user_1 = $req->user_id1;
+        $new->user_2 = $req->user_id2;
         if ($new->save()) return response()->json(['message' => "Tạo thành công"], 200);
         return response()->json(['message' => "Có lỗi xảy ra, vui lòng thử lại"], 500);
     }
@@ -63,11 +86,28 @@ class ChatController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $req)
     {
         //
-        $details = ChatDetail::where('chat_history_id', $id);
-        return response()->json($details, 200);
+        $chat = Chat::find($id);
+        if($req->input('user_id') == $chat->user_1) {
+            $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
+            if($name == '') {
+                $name = Lecture::find($chat->user_2)->first_name_lecturer .' ' .Student::find($chat->user_2)->last_name_lecturer;
+            }
+        } else {
+            $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
+            if($name == '') {
+                $name = Lecture::find($chat->user_1)->first_name_lecturer .' ' .Student::find($chat->user_1)->last_name_lecturer;
+            }
+        }
+
+        $messages = ChatDetail::where('chat_history_id', $id)->get();
+        return response()->json([
+            'success' => true,
+            'name' => $name,
+            'messages' => $messages
+        ], 200);
     }
 
     /**
