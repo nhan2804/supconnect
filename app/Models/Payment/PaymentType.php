@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Payment;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Grade_Book extends Model
+class PaymentType extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    protected $primaryKey = 'grade_book_id';
-    protected $table = 'grade_book';
+    protected $table = 'transaction_type';
+    protected $primaryKey = 'transaction_type_id';
 }

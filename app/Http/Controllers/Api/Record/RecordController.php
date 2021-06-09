@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Record;
 
 use App\Http\Controllers\Controller;
+use App\Models\Record\RecordDetail;
+use App\Models\Student;
 use Illuminate\Http\Request;
-use App\Models\Announcement;
-use App\Models\Announcement_Type;
 
-class AnnouncementController extends Controller
+class RecordController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,13 +16,25 @@ class AnnouncementController extends Controller
      */
     public function index()
     {
-        $announcement = Announcement::join('announcement_type', 'announcement_type.announcement_type_id', 'announcement.announcement_type_id')->orderBy('announcement.announcement_id', 'desc')->get();
+        $id_sv = Student::where('account_id', 4)->first()->student_id;
 
-        
-        return response()->json([
-            'success' => true,
-            'announcement' => $announcement
+        RecordDetail::create([
+            'record_id' => 1,
+            'student_id' => $id_sv,
+            'is_attend' => 1,
+            'leave_of_absence_letter' => 1,
+            'reason' => 'None with' . $i
         ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
     }
 
     /**
@@ -44,14 +56,18 @@ class AnnouncementController extends Controller
      */
     public function show($id)
     {
-        $announcement = Announcement::join('announcement_type', 'announcement_type.announcement_type_id', 'announcement.announcement_type_id')
-                    ->orderBy('announcement.announcement_id', 'desc')
-                    ->where('announcement_id', $id)
-                    ->get();
-        return response()->json([
-            'success' => true,
-            'announcement' => $announcement
-        ]);
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
     }
 
     /**

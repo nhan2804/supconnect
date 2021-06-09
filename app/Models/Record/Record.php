@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Record;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Announcement_Type extends Model
+class Record extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'announcement_type_id';
-    protected $table = 'announcement_type';
     public $timestamps = false;
+    protected $table = 'roll_call_record';
+    protected $primaryKey = 'record_id';
 }
