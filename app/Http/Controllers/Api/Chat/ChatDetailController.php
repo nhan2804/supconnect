@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Chat;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use DB;
 use App\Models\ChatDetail;
 use App\Models\Chat;
@@ -37,10 +38,19 @@ class ChatDetailController extends Controller
     public function store(Request $req)
     {
         $new = new ChatDetail;
+        if($req->type == 'text') {
+            $new->message = $req->message;
+        } elseif ($req->type == 'image') {
+            $image = str_replace('data:image/jpeg;base64,', '', $req->message);
+            $image = str_replace(' ', '+', $image);
+            $imageName = time().'.'.'jpg';
+            Storage::disk('store_message')->put($imageName, base64_decode($image));
+            $new->message = 'store/messages/' .$imageName;
+        }
+        $new->type = $req->type;
         $new->chat_history_id = $req->id_chat;
         $new->sender_id = $req->sender_id;
-        $new->message = $req->message;
-        $new->time =  date("Y-m-d h:i:s");
+        $new->time = date("Y-m-d h:i:s");
 
         if (!$new->save()) return response()->json(['message' => "Error"], 500);
         return response()->json($new, 200);

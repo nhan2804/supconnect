@@ -8,6 +8,7 @@ use App\Models\Chat;
 use App\Models\Student;
 use App\Models\Lecturer;
 use App\Models\ChatDetail;
+use App\Models\Class_List;
 use App\Models\Faculty;
 use App\Models\Lecturer_Degree_Type;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,11 @@ class ChatController extends Controller
             $message = ChatDetail::where('chat_history_id', $chat->chat_history_id)
             ->orderBy('chat_history_detail_id', 'desc')
             ->first();
-            $chat->message = $message->message;
+            if($message->type = 'image') {
+                $chat->message = 'Hình ảnh';
+            } elseif($message->type = 'text') {
+                $chat->message = $message->message;
+            }
             $chat->messageTime = $message->time;
             if($req->input('user_id') == $chat->user_1) {
                 if(Student::find($chat->user_2)!=null){
