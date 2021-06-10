@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Api\Lecturer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lecturer;
+
+use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class LecturerController extends Controller
 {
@@ -13,10 +17,22 @@ class LecturerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+    public function index(Request $request)
     {
-        $info = Lecturer::find('GVBA001');
-        return response($info, 200);
+        $lecturers = Lecturer::all();
+
+        $class_lecturers = DB::table('student_of_subject_class')
+                                ->join('subject_class', 'subject_class','subject_class_id')
+                                ->join('lecturer', 'subject_class.lecturer_id', 'lecturer.lecturer_id')
+                                ->where('student_id', $request->student_id)
+                                ->get();
+
+        return response()->json([
+            'success'=>true,
+            'all_lectures'=>$lecturers,
+            'class_lecturers'=>$class_lecturers,
+        ], 200);
     }
 
     /**
@@ -35,17 +51,21 @@ class LecturerController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $r)
+
+    public function store(Request $request)
     {
+        //
+
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Lecturer  $lecturer
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Lecturer $lecturer)
+
     {
         //
     }
@@ -53,10 +73,10 @@ class LecturerController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  \App\Models\Lecturer  $lecturer
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Lecturer $lecturer)
     {
         //
     }
@@ -65,28 +85,23 @@ class LecturerController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \App\Models\Lecturer  $lecturer
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Lecturer $lecturer)
     {
-        $e = Lecturer::find('GVBA001');
-        $e->first_name_lecturer = $r->first_name_lecturer;
-        $e->last_name_lecturer = $r->last_name_lecturer;
-        $e->date_of_birth = $r->date_of_birth;
-        $e->phone_number_lecturer = $r->phone_number_lecturer;
-        $e->email = $r->email;
-        if ($e->save()) return response(['message' => 'Thành công'], 200);
-        return response(['message' => 'Có lỗi xảy ra'], 500);
+        //
+
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  \App\Models\Lecturer  $lecturer
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Lecturer $lecturer)
+
     {
         //
     }

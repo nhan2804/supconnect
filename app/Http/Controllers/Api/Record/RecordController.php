@@ -43,6 +43,7 @@ class RecordController extends Controller
             'record' => $records,
             'total_count' => $records->count(),
             'absence_count'=>$absencerecords->count(),
+
         ], 200);
     }
 
