@@ -136,4 +136,19 @@ class StudentController extends Controller
         ]);
 
     }
+
+    public function getSubject($student_id) {
+        $now = date('Y-m-d');   
+        $subjectResults = Student_Of_Subject_Class::join('subject_class', 'subject_class.subject_class_id', 'student_of_subject_class.subject_class' )
+            ->where('student_of_subject_class.student_id', $student_id) 
+            ->where('subject_class.date_start', '<=', $now)
+            ->where('subject_class.date_end', '>=', $now)
+            ->select('student_of_subject_class.subject_class', 'subject_class.subject_class_name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'subjects' => $subjectResults   
+        ]);
+    }
 }
