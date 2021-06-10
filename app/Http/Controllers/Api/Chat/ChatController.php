@@ -8,6 +8,8 @@ use App\Models\Chat;
 use App\Models\Student;
 use App\Models\Lecturer;
 use App\Models\ChatDetail;
+use App\Models\Faculty;
+use App\Models\Lecturer_Degree_Type;
 use Illuminate\Support\Facades\Auth;
 use DB;
 
@@ -37,8 +39,14 @@ class ChatController extends Controller
                     $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
                     $avatar = Student::find($chat->user_2)->avatar;
                 }
+<<<<<<< HEAD
                 else {
                     $name = Lecturer::find($chat->user_2)->first_name_lecturer .' ' .Lecturer::find($chat->user_2)->last_name_lecturer;
+=======
+                else{
+                    $lecturer = Lecturer::find($chat->user_2);
+                    $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' '.$lecturer->last_name_lecturer;
+>>>>>>> master
                     $avatar = Lecturer::find($chat->user_2)->avatar;
                 }
             } else {
@@ -46,8 +54,14 @@ class ChatController extends Controller
                     $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
                     $avatar = Student::find($chat->user_1)->avatar;
                 }
+<<<<<<< HEAD
                 else {
                     $name = Lecturer::find($chat->user_1)->first_name_lecturer .' ' .Lecturer::find($chat->user_1)->last_name_lecturer;
+=======
+                if($name == '') {
+                    $lecturer = Lecturer::find($chat->user_1);
+                    $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer;
+>>>>>>> master
                     $avatar = Lecturer::find($chat->user_1)->avatar;
                 }
             }
@@ -100,21 +114,27 @@ class ChatController extends Controller
         $chat = Chat::find($id);
         if($req->input('user_id') == $chat->user_1) {
             if(Student::find($chat->user_2)!=null){
-                $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
+                $name = Student::find($chat->user_2)->first_name .' '.Student::find($chat->user_2)->last_name;
                 $avatar = Student::find($chat->user_2)->avatar;
+                $faculty = Class_List::find(Student::find($chat->user_2)->class_id)->class_name;
             }
             else{
-                $name = Lecturer::find($chat->user_2)->first_name_lecturer .' ' .Lecturer::find($chat->user_2)->last_name_lecturer;
-                $avatar = Lecturer::find($chat->user_2)->avatar;
+                $lecturer = Lecturer::find($chat->user_2);
+                $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer;
+                $avatar = $lecturer->avatar;
+                $faculty = 'Khoa '.Faculty::find($lecturer->faculty_id)->faculty_name;
             }
         } else {
             if(Student::find($chat->user_1)!=null){
-                $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
+                $name = Student::find($chat->user_1)->first_name .' '.Student::find($chat->user_1)->last_name;
                 $avatar = Student::find($chat->user_1)->avatar;
+                $faculty = Class_List::find(Student::find($chat->user_2)->class_id)->class_name;
             }
             else{
-                $name = Lecturer::find($chat->user_1)->first_name_lecturer .' ' .Lecturer::find($chat->user_1)->last_name_lecturer;
-                $avatar = Lecturer::find($chat->user_2)->avatar;
+                $lecturer = Lecturer::find($chat->user_1);
+                $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer;
+                $avatar = $lecturer->avatar;
+                $faculty = Faculty::find($lecturer->faculty_id)->faculty_name;
             }
         }
 
@@ -123,6 +143,7 @@ class ChatController extends Controller
             'success' => true,
             'name' => $name,
             'avatar' =>$avatar,
+            'faculty' =>$faculty,
             'messages' => $messages
         ], 200);
     }

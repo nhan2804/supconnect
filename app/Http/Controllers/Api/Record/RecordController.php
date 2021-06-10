@@ -3,9 +3,14 @@
 namespace App\Http\Controllers\Api\Record;
 
 use App\Http\Controllers\Controller;
+use App\Models\Record\Record;
 use App\Models\Record\RecordDetail;
 use App\Models\Student;
+use App\Models\Subject_Class;
+use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class RecordController extends Controller
 {
@@ -14,17 +19,31 @@ class RecordController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $id_sv = Student::where('account_id', 4)->first()->student_id;
+        $student = Student::where('student_id', $request->user_id)->first();
 
-        RecordDetail::create([
-            'record_id' => 1,
-            'student_id' => $id_sv,
-            'is_attend' => 1,
-            'leave_of_absence_letter' => 1,
-            'reason' => 'None with' . $i
-        ]);
+        //get only record of that student from a specified subject class
+        $records = Record::join('roll_call_record_detail', 'roll_call_record.record_id', 'roll_call_record_detail.record_id')
+                    ->where('subject_class', $request->subject_class)
+                    ->where('student_id', $student->student_id)
+                    ->orderBy('date', 'asc')
+                    ->get();
+        $absencerecords = Record::join('roll_call_record_detail', 'roll_call_record.record_id', 'roll_call_record_detail.record_id')
+        ->where('subject_class', $request->subject_class)
+        ->where('student_id', $student->student_id)
+        ->where('roll_call_record_detail.is_attend', 0)
+        ->orderBy('date', 'asc')
+        ->get();
+
+        $subject_class = Subject_Class::find($request->subject_class)->subject_class_name;
+        return response()->json([
+            'success' => true,
+            'subject_class_name'=> $subject_class,
+            'record' => $records,
+            'total_count' => $records->count(),
+            'absence_count'=>$absencerecords->count(),
+        ], 200);
     }
 
     /**
@@ -45,7 +64,13 @@ class RecordController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // RecordDetail::create([
+        //     'record_id' => 1,
+        //     'student_id' => $id_sv,
+        //     'is_attend' => 1,
+        //     'leave_of_absence_letter' => 1,
+        //     'reason' => 'None with' . $id_sv
+        // ]);
     }
 
     /**
