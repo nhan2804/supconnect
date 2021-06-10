@@ -26,7 +26,9 @@ class PaymentController extends Controller
         foreach($payments as $payment) {
             $payment->type_name = DB::table('transaction_type')
                 ->where('transaction_type_id', $payment->transaction_type_id )->first()->transaction_type_name;
-            $payment->category_name = $this->getCateName($payment);
+            if($payment->transaction_type_id == 2) {
+                $payment->category_name = $this->getCateName($payment);
+            }
         }
 
         return response()->json([

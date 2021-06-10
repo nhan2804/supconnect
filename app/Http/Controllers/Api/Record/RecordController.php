@@ -34,7 +34,7 @@ class RecordController extends Controller
 
         return response()->json([
             'success' => true,
-            'record' => $record
+            'record' => $records
         ], 200);
     }
 

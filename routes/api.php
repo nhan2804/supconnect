@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TodoController;
 use App\Http\Controllers\Api\Chat\ChatController;
 use App\Http\Controllers\Api\Chat\ChatDetailController;
+use App\Http\Controllers\Api\Lecturer\LecturerController;
 use App\Http\Controllers\Api\Target\TargetController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Record\RecordController;
@@ -31,13 +32,12 @@ Route::resource('chat', ChatController::class);
 Route::resource('chat-details', ChatDetailController::class);
 Route::resource('target', TargetController::class);
 Route::resource('payment', PaymentController::class);
+Route::resource('lecturer', LecturerController::class);
 // extra route to get details of the paymet
 Route::get('paymentdetail', [PaymentController::class, 'detail']);
 
 Route::resource('record', RecordController::class);
 //endchat
-
-
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
