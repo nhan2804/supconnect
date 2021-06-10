@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Chat;
 use App\Models\Student;
-use App\Models\Lecture;
+use App\Models\Lecturer;
 use App\Models\ChatDetail;
 use Illuminate\Support\Facades\Auth;
 use DB;
@@ -21,12 +21,11 @@ class ChatController extends Controller
 
     public function index(Request $req)
     {
-        // Auth::user()->account_id chưa có login
-        //  DB::enableQueryLog(); // Enable query log
+
         $chats = Chat::where('user_1', $req->input('user_id'))
                         ->orWhere('user_2', $req->input('user_id'))
                         ->get();
-        
+
         foreach($chats as $chat) {
             $message = ChatDetail::where('chat_history_id', $chat->chat_history_id)
             ->orderBy('chat_history_detail_id', 'desc')
@@ -34,18 +33,27 @@ class ChatController extends Controller
             $chat->message = $message->message;
             $chat->messageTime = $message->time;
             if($req->input('user_id') == $chat->user_1) {
-                $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
-                if($name == '') {
-                    $name = Lecture::find($chat->user_2)->first_name_lecturer .' ' .Student::find($chat->user_2)->last_name_lecturer;
+                if(Student::find($chat->user_2)!=null){
+                    $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
+                    $avatar = Student::find($chat->user_2)->avatar;
+                }
+                else{
+                    $name = Lecturer::find($chat->user_2)->first_name_lecturer .' ' .Lecturer::find($chat->user_2)->last_name_lecturer;
+                    $avatar = Lecturer::find($chat->user_2)->avatar;
                 }
             } else {
-                $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
+                if(Student::find($chat->user_1)!=null){
+                    $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
+                    $avatar = Student::find($chat->user_1)->avatar;
+                }
                 if($name == '') {
-                    $name = Lecture::find($chat->user_1)->first_name_lecturer .' ' .Student::find($chat->user_1)->last_name_lecturer;
+                    $name = Lecturer::find($chat->user_1)->first_name_lecturer .' ' .Lecturer::find($chat->user_1)->last_name_lecturer;
+                    $avatar = Lecturer::find($chat->user_1)->avatar;
                 }
             }
 
             $chat->name = $name;
+            $chat->avatar = $avatar;
         }
 
         return response()->json([
@@ -72,7 +80,7 @@ class ChatController extends Controller
      */
     public function store(Request $req)
     {
-        // Auth::user()->account_id chưa có login
+
         $new = new Chat;
         $new->user_1 = $req->user_id1;
         $new->user_2 = $req->user_id2;
@@ -88,17 +96,25 @@ class ChatController extends Controller
      */
     public function show($id, Request $req)
     {
-        //
+
         $chat = Chat::find($id);
         if($req->input('user_id') == $chat->user_1) {
-            $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
-            if($name == '') {
-                $name = Lecture::find($chat->user_2)->first_name_lecturer .' ' .Student::find($chat->user_2)->last_name_lecturer;
+            if(Student::find($chat->user_2)!=null){
+                $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
+                $avatar = Student::find($chat->user_2)->avatar;
+            }
+            else{
+                $name = Lecturer::find($chat->user_2)->first_name_lecturer .' ' .Lecturer::find($chat->user_2)->last_name_lecturer;
+                $avatar = Lecturer::find($chat->user_2)->avatar;
             }
         } else {
-            $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
-            if($name == '') {
-                $name = Lecture::find($chat->user_1)->first_name_lecturer .' ' .Student::find($chat->user_1)->last_name_lecturer;
+            if(Student::find($chat->user_1)!=null){
+                $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
+                $avatar = Student::find($chat->user_1)->avatar;
+            }
+            else{
+                $name = Lecturer::find($chat->user_1)->first_name_lecturer .' ' .Lecturer::find($chat->user_1)->last_name_lecturer;
+                $avatar = Lecturer::find($chat->user_2)->avatar;
             }
         }
 
@@ -106,6 +122,7 @@ class ChatController extends Controller
         return response()->json([
             'success' => true,
             'name' => $name,
+            'avatar' =>$avatar,
             'messages' => $messages
         ], 200);
     }
