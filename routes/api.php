@@ -31,8 +31,13 @@ Route::resource('chat', ChatController::class);
 Route::resource('chat-details', ChatDetailController::class);
 Route::resource('target', TargetController::class);
 Route::resource('payment', PaymentController::class);
+// extra route to get details of the paymet
+Route::get('paymentdetail', [PaymentController::class, 'detail']);
+
 Route::resource('record', RecordController::class);
 //endchat
+
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
