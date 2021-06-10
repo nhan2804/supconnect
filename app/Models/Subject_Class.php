@@ -10,7 +10,7 @@ class Subject_Class extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    // protected $primaryKey = 'subject_class_id';
+    protected $primaryKey = 'subject_class_id';
     protected $table = 'subject_class';
     public function subject()
     {
@@ -18,6 +18,6 @@ class Subject_Class extends Model
     }
     public function students()
     {
-        return $this->hasMany(Student_Of_Subject_Class::class, 'subject_class', 'subject_class');
+        return $this->hasMany(Student_Of_Subject_Class::class, 'subject_class', 'subject_class_id');
     }
 }
