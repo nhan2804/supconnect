@@ -7,7 +7,7 @@ use App\Models\Payment\Payment;
 use App\Models\Payment\PaymentDetail;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
@@ -16,9 +16,40 @@ class PaymentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+
+    public function index(Request $request)
     {
-        //
+        $student = Student::where('account_id', $request->acc_id)->first();
+
+        $payments = Payment::where('user_id', $student->student_id)->get();
+
+        foreach($payments as $payment) {
+            $payment->type_name = DB::table('transaction_type')
+                ->where('transaction_type_id', $payment->transaction_type_id )->first()->transaction_type_name;
+            $payment->category_name = $this->getCateName($payment);
+        }
+
+        return response()->json([
+            'success'=>true,
+            'payments' => $payments
+        ], 200);
+    }
+
+    private function getCateName($payment) {
+        $cateID = PaymentDetail::where('transaction_history_id', $payment->transaction_history_id)
+                                                    ->first()->transaction_category_id;
+        $name = DB::table('transaction_category')
+                    ->where('transaction_category_id', $cateID)->pluck('transaction_category_name')[0];
+        return  $name;
+    }
+
+    public function detail(Request $request) {
+        $detail = PaymentDetail::where('transaction_history_id', $request->id)->first();
+
+        return response()->json([
+            'success'=>true,
+            'detail'=>$detail
+        ]);
     }
 
     /**
@@ -37,26 +68,35 @@ class PaymentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $r)
+    public function store(Request $request)
     {
-        $id_sv = Student::where('account_id', 4)->first()->student_id;
-        $new = new Payment;
-        $new->user_id = $id_sv;
-        $new->transaction_type_id = 2;
-        $new->date = date('Y-m-d h:i:s');
-        $new->amount = $r->amount;
+        $student = Student::where('account_id', $request->acc_id)->first();
+        
+        $newPayment = new Payment;
+        $newPayment->user_id = $student->student_id;
+        $newPayment->transaction_type_id = $request->type;
+        $newPayment->date = date('Y-m-d h:i:s');
+        $newPayment->amount = $request->amount;
 
-        $new->save();
-        $new_d = new PaymentDetail;
+        $newPayment->save();
 
-        $new_d->transaction_history_id =
-            DB::getPdo()->lastInsertId();
-        $new_d->transaction_category_id = $r->transaction_category_id;
-        $new_d->amount = $r->amount;
-        $new_d->description = $r->description;
+        $newDetail = new PaymentDetail;
 
-        if ($new_d->save()) return response()->json(['message' => "Thành công"], 200);
-        return response()->json(['message' => "Có lỗi xảy ra"], 500);
+        $newDetail->transaction_history_id = $newPayment->transaction_history_id;
+        $newDetail->transaction_category_id = $request->category;
+        $newDetail->amount = $request->amount;
+        $newDetail->description = $request->description;
+
+        if ($newDetail->save()) 
+            return response()->json([
+                'success' => true,
+                'payment' => $newPayment,
+                'detail' => $newDetail
+            ], 200);
+
+        return response()->json([
+            'success' => "false"
+        ], 500);
     }
 
     /**
