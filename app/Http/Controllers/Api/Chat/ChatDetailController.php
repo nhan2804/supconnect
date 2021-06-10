@@ -17,7 +17,6 @@ class ChatDetailController extends Controller
      */
     public function index()
     {
-        return "ssdss";
     }
 
     /**
@@ -27,7 +26,6 @@ class ChatDetailController extends Controller
      */
     public function create()
     {
-        return "ứ1ssss";
     }
 
     /**
@@ -81,11 +79,11 @@ class ChatDetailController extends Controller
     {
 
         if($id == 0) {
-            $id = $this->checkIsValidRoom($req->user_1, $req->user_2); 
+            $id = $this->checkIsValidRoom($req->user_1, $req->user_2);
         }
         $details = ChatDetail::where('chat_history_id', $id)->get();
         foreach($details as $detail) {
-            
+
         }
         return response()->json($detail, 200);
         // dd(DB::getQueryLog());
