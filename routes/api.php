@@ -9,6 +9,9 @@ use App\Http\Controllers\Api\Lecturer\LecturerController;
 use App\Http\Controllers\Api\Target\TargetController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Record\RecordController;
+use App\Http\Controllers\Api\Lecturer\SubjecClassController;
+use App\Http\Controllers\Api\Lecturer\LecturerController;
+use App\Http\Controllers\Api\Lecturer\AnnouncementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,10 +40,17 @@ Route::resource('lecturer', LecturerController::class);
 Route::get('paymentdetail', [PaymentController::class, 'detail']);
 
 Route::resource('record', RecordController::class);
+Route::prefix('lecturer')->group(function () {
+    Route::resource('/', LecturerController::class);
+    Route::resource('subject-class', SubjecClassController::class);
+    Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
+    Route::resource('announcement', AnnouncementController::class);
+});
 //endchat
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 
 
 
@@ -54,6 +64,8 @@ Route::prefix('student')->group(function () {
     Route::get('/assignment/list/{student_id}', 'App\Http\Controllers\Api\AssignmentController@studentAssignment');
     Route::get('/assignment/{student_id}', 'App\Http\Controllers\Api\AssignmentController@show');
 
+    Route::get('/subjects/{student_id}', 'App\Http\Controllers\Api\StudentController@getSubject');
+
     Route::get('/announcement', 'App\Http\Controllers\Api\AnnouncementController@index');
     Route::get('/announcement/{id}', 'App\Http\Controllers\Api\AnnouncementController@show');
 
@@ -62,9 +74,8 @@ Route::prefix('student')->group(function () {
     Route::get('/{account_id}', 'App\Http\Controllers\Api\StudentController@show');
     Route::put('/{account_id}', 'App\Http\Controllers\Api\StudentController@update');
 
-    Route::get('/leavenotice/list/{student_id}','App\Http\Controllers\Api\LeaveNoticeController@studentLeaveNotice');
+    Route::get('/leavenotice/list/{student_id}', 'App\Http\Controllers\Api\LeaveNoticeController@studentLeaveNotice');
     Route::get('/leavenotice/{student_id}', 'App\Http\Controllers\Api\LeaveNoticeController@show');
-
 });
 
 Route::get('test', function () {
