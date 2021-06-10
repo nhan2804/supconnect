@@ -12,9 +12,11 @@ GET Lấy tất cả những Lớp GV đang dạy. Mảng 2 chiều
 lecturer/subject-class/:id
 GET lấy Danh sách sinh viên dạy trong ngày của lớp :id, nếu vào lần đầu thì sẽ tự tạo, return ông tự xem
 giúp tôi
+Và query string là date (Y-m-d) dùng để làm xem ngày kế tiếp
 
     lecturer/subject-class/:id
     PUT edit Tên lession lớp học hôm đó: :id của lớp và params {lesson}
+
 
     lecturer/subject-class/edit_record/:id
     PUT Edit lại vắng/không vắng ( Đã toggle, chỉ cần gửi :id record detail)
