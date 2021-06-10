@@ -39,14 +39,9 @@ class ChatController extends Controller
                     $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
                     $avatar = Student::find($chat->user_2)->avatar;
                 }
-<<<<<<< HEAD
-                else {
-                    $name = Lecturer::find($chat->user_2)->first_name_lecturer .' ' .Lecturer::find($chat->user_2)->last_name_lecturer;
-=======
                 else{
                     $lecturer = Lecturer::find($chat->user_2);
                     $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' '.$lecturer->last_name_lecturer;
->>>>>>> master
                     $avatar = Lecturer::find($chat->user_2)->avatar;
                 }
             } else {
@@ -54,14 +49,9 @@ class ChatController extends Controller
                     $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
                     $avatar = Student::find($chat->user_1)->avatar;
                 }
-<<<<<<< HEAD
-                else {
-                    $name = Lecturer::find($chat->user_1)->first_name_lecturer .' ' .Lecturer::find($chat->user_1)->last_name_lecturer;
-=======
                 if($name == '') {
                     $lecturer = Lecturer::find($chat->user_1);
                     $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer;
->>>>>>> master
                     $avatar = Lecturer::find($chat->user_1)->avatar;
                 }
             }
