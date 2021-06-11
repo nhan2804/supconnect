@@ -10,5 +10,6 @@ class Lecturer extends Model
     use HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'lecturer_id';
+    protected $keyType = 'string';
     protected $table = 'lecturer';
 }

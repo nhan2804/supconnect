@@ -23,6 +23,7 @@ class LecturerController extends Controller
                                 ->join('subject_class', 'subject_class','subject_class_id')
                                 ->join('lecturer', 'subject_class.lecturer_id', 'lecturer.lecturer_id')
                                 ->where('student_id', $request->student_id)
+                                ->select('lecturer.*')
                                 ->get();
 
         return response()->json([
