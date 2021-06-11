@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Record\RecordController;
 use App\Http\Controllers\Api\Lecturer\SubjecClassController;
 use App\Http\Controllers\Api\Lecturer\AnnouncementController;
+use App\Http\Controllers\Api\Lecturer\LecturerController;
 
 /*
 |--------------------------------------------------------------------------
