@@ -9,7 +9,6 @@ use App\Http\Controllers\Api\Target\TargetController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Record\RecordController;
 use App\Http\Controllers\Api\Lecturer\SubjecClassController;
-use App\Http\Controllers\Api\Lecturer\LecturerController;
 use App\Http\Controllers\Api\Lecturer\AnnouncementController;
 
 /*

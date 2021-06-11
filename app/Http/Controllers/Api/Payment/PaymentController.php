@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account_Balance;
 use App\Models\Payment\Payment;
 use App\Models\Payment\PaymentDetail;
 use App\Models\Student;
@@ -72,10 +73,21 @@ class PaymentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+    /**
+     * Request params:
+     *  - acc_id : account_id
+     *  - type: type of the transaction, recharge or pay
+     *  - amount: how much currency is recharged or spent
+     *  - category: category of the transaction. Payment only
+     *  - description: description of the transaction, obviously
+     */
     public function store(Request $request)
     {
         $student = Student::where('account_id', $request->acc_id)->first();
 
+        $acc_balance = Account_Balance::where('account_id', $request->acc_id)->first();
+        
         $newPayment = new Payment;
         $newPayment->user_id = $student->student_id;
         $newPayment->transaction_type_id = $request->type;
@@ -85,17 +97,30 @@ class PaymentController extends Controller
         $newPayment->save();
 
         $newDetail = new PaymentDetail;
-
         $newDetail->transaction_history_id = $newPayment->transaction_history_id;
-        $newDetail->transaction_category_id = $request->category;
+        $newDetail->transaction_category_id = $request->category ? $request->category : null;
         $newDetail->amount = $request->amount;
-        $newDetail->description = $request->description;
+        $newDetail->description = $request->description ? $request->description : "";
 
-        if ($newDetail->save())
+        $oldBalance = $acc_balance->balance;
+
+        $newBalance = 0;
+        if($newPayment->transaction_type_id == 1) {
+            $newBalance = $oldBalance + $newPayment->amount;
+        }
+        if($newPayment->transaction_type_id == 2) {
+            $newBalance = $oldBalance - $newPayment->amount;
+        }
+        $acc_balance->balance = $newBalance;
+
+        if ($newDetail->save() && $acc_balance->update([
+            'amount' => $newBalance
+        ])) 
             return response()->json([
                 'success' => true,
                 'payment' => $newPayment,
-                'detail' => $newDetail
+                'detail' => $newDetail,
+                'balance' => $acc_balance
             ], 200);
 
         return response()->json([
