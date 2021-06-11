@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Record\Record;
 use App\Models\Record\RecordDetail;
 use App\Models\Student;
+use App\Models\Subject_Class;
 use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class RecordController extends Controller
 {
@@ -19,31 +21,30 @@ class RecordController extends Controller
      */
     public function index(Request $request)
     {
-        $student = Student::where('account_id', $request->acc_id)->first();
+        $student = Student::where('student_id', $request->user_id)->first();
 
         //get only record of that student from a specified subject class
         $records = Record::join('roll_call_record_detail', 'roll_call_record.record_id', 'roll_call_record_detail.record_id')
                     ->where('subject_class', $request->subject_class)
                     ->where('student_id', $student->student_id)
+                    ->orderBy('date', 'asc')
                     ->get();
+        $absencerecords = Record::join('roll_call_record_detail', 'roll_call_record.record_id', 'roll_call_record_detail.record_id')
+        ->where('subject_class', $request->subject_class)
+        ->where('student_id', $student->student_id)
+        ->where('roll_call_record_detail.is_attend', 0)
+        ->orderBy('date', 'asc')
+        ->get();
 
-        //get details of those records
-            foreach($records as $record) {
-                $record->subject_class_name = $this->getSubjectClassName($record);
-            }
-
+        $subject_class = Subject_Class::find($request->subject_class)->subject_class_name;
         return response()->json([
             'success' => true,
-            'record' => $records
+            'subject_class_name'=> $subject_class,
+            'record' => $records,
+            'total_count' => $records->count(),
+            'absence_count'=>$absencerecords->count(),
+
         ], 200);
-    }
-
-    private function getSubjectClassName($record) {
-        $subject = DB::table('subject_class')->where('subject_class_id', $record->subject_class)
-                    ->first()->subject_id;
-
-        $name = DB::table('subject_list')->where('subject_id', $subject)->first()->subject_name;
-        return $name;
     }
 
     /**

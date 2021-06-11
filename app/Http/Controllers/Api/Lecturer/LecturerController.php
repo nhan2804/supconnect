@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api\Lecturer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lecturer;
+
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
 
 class LecturerController extends Controller
 {
@@ -15,6 +17,7 @@ class LecturerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index(Request $request)
     {
         $lecturers = Lecturer::all();
@@ -49,9 +52,11 @@ class LecturerController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
     public function store(Request $request)
     {
         //
+
     }
 
     /**
@@ -61,6 +66,7 @@ class LecturerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Lecturer $lecturer)
+
     {
         //
     }
@@ -86,6 +92,7 @@ class LecturerController extends Controller
     public function update(Request $request, Lecturer $lecturer)
     {
         //
+
     }
 
     /**
@@ -95,6 +102,7 @@ class LecturerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy(Lecturer $lecturer)
+
     {
         //
     }

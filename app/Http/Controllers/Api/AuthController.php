@@ -5,12 +5,16 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Auth;
 use Hash;
 use App\Models\Account;
 use App\Models\Student;
 use App\Models\Account_Role;
 use App\Models\Class_List;
+use App\Models\User;
+use Session;
+use DB;
 
 
 class AuthController extends Controller
@@ -29,6 +33,8 @@ class AuthController extends Controller
             $account->studentId = $student->student_id;
             $account->firstName = $student->first_name;
             $account->lastName = $student->last_name;
+            $account->age = $student->age;
+            $account->studentId = $student->student_id;
             $account->dateOfBirth = $student->date_of_birth;
             $account->phoneNumber = $student->phone_number;
             $account->startYear = $student->start_year;

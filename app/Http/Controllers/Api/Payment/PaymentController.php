@@ -9,7 +9,6 @@ use App\Models\Payment\PaymentDetail;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Mockery\Undefined;
 
 class PaymentController extends Controller
 {
@@ -25,34 +24,36 @@ class PaymentController extends Controller
 
         $payments = Payment::where('user_id', $student->student_id)->get();
 
-        foreach($payments as $payment) {
+        foreach ($payments as $payment) {
             $payment->type_name = DB::table('transaction_type')
-                ->where('transaction_type_id', $payment->transaction_type_id )->first()->transaction_type_name;
-            if($payment->transaction_type_id == 2) {
+                ->where('transaction_type_id', $payment->transaction_type_id)->first()->transaction_type_name;
+            if ($payment->transaction_type_id == 2) {
                 $payment->category_name = $this->getCateName($payment);
             }
         }
 
         return response()->json([
-            'success'=>true,
+            'success' => true,
             'payments' => $payments
         ], 200);
     }
 
-    private function getCateName($payment) {
+    private function getCateName($payment)
+    {
         $cateID = PaymentDetail::where('transaction_history_id', $payment->transaction_history_id)
-                                                    ->first()->transaction_category_id;
+            ->first()->transaction_category_id;
         $name = DB::table('transaction_category')
-                    ->where('transaction_category_id', $cateID)->pluck('transaction_category_name')[0];
+            ->where('transaction_category_id', $cateID)->pluck('transaction_category_name')[0];
         return  $name;
     }
 
-    public function detail(Request $request) {
+    public function detail(Request $request)
+    {
         $detail = PaymentDetail::where('transaction_history_id', $request->id)->first();
 
         return response()->json([
-            'success'=>true,
-            'detail'=>$detail
+            'success' => true,
+            'detail' => $detail
         ]);
     }
 
