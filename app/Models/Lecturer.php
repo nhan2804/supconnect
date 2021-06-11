@@ -11,6 +11,5 @@ class Lecturer extends Model
     protected $keyType = 'string';
     public $timestamps = false;
     protected $primaryKey = 'lecturer_id';
-    protected $keyType = 'string';
     protected $table = 'lecturer';
 }
