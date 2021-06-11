@@ -21,5 +21,6 @@ class Student extends Model
         'class_id',
         'email',
         'avatar',
+        'card_UID'
     ];
 }

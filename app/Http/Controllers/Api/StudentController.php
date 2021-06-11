@@ -151,4 +151,13 @@ class StudentController extends Controller
             'subjects' => $subjectResults   
         ]);
     }
+
+    public function cardID($id) {
+        $student = Student::where('card_UID', $id)->first();
+        $student->class = Class_List::find($student->class_id)->class_name;
+        return response()->json([
+            'success' => true,
+            'user' => $student
+        ]);
+    }
 }

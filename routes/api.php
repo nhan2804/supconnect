@@ -65,6 +65,8 @@ Route::prefix('student')->group(function () {
 
     Route::get('/subjects/{student_id}', 'App\Http\Controllers\Api\StudentController@getSubject');
 
+    Route::get('/card/{id}', 'App\Http\Controllers\Api\StudentController@cardID');
+
     Route::get('/announcement', 'App\Http\Controllers\Api\AnnouncementController@index');
     Route::get('/announcement/{id}', 'App\Http\Controllers\Api\AnnouncementController@show');
 
