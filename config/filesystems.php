@@ -29,6 +29,10 @@ return [
     */
 
     'disks' => [
+        'store_message' => [
+            'driver' => 'local',
+            'root' => public_path() .'/store/messages',
+        ],
 
         'local' => [
             'driver' => 'local',

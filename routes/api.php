@@ -5,12 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TodoController;
 use App\Http\Controllers\Api\Chat\ChatController;
 use App\Http\Controllers\Api\Chat\ChatDetailController;
-use App\Http\Controllers\Api\Lecturer\LecturerController;
 use App\Http\Controllers\Api\Target\TargetController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Record\RecordController;
 use App\Http\Controllers\Api\Lecturer\SubjecClassController;
 use App\Http\Controllers\Api\Lecturer\AnnouncementController;
+use App\Http\Controllers\Api\Lecturer\LecturerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,9 +35,6 @@ Route::resource('chat-details', ChatDetailController::class);
 Route::resource('target', TargetController::class);
 Route::resource('payment', PaymentController::class);
 Route::resource('lecturer', LecturerController::class);
-// extra route to get details of the paymet
-Route::get('paymentdetail', [PaymentController::class, 'detail']);
-
 Route::resource('record', RecordController::class);
 Route::prefix('lecturer')->group(function () {
     Route::resource('/', LecturerController::class);
@@ -64,6 +61,8 @@ Route::prefix('student')->group(function () {
     Route::get('/assignment/{student_id}', 'App\Http\Controllers\Api\AssignmentController@show');
 
     Route::get('/subjects/{student_id}', 'App\Http\Controllers\Api\StudentController@getSubject');
+
+    Route::get('/card/{id}', 'App\Http\Controllers\Api\StudentController@cardID');
 
     Route::get('/announcement', 'App\Http\Controllers\Api\AnnouncementController@index');
     Route::get('/announcement/{id}', 'App\Http\Controllers\Api\AnnouncementController@show');

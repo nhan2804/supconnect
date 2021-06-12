@@ -90,6 +90,7 @@ class SubjecClassController extends Controller
                 $n->save();
             }
         }
+
         $students = DB::table('subject_class')->where('subject_class.subject_class_id', $id)->where('lecturer_id', 'GVCS002')
             ->whereDate('date_start', '<=', $now)
             ->whereDate('date_end', '>=', $now)
@@ -110,7 +111,7 @@ class SubjecClassController extends Controller
             'students'=>$students,
         ], 200);
         // dd(DB::getQueryLog());
-        // return $list_std = 
+        // return $list_std =
     }
 
     /**

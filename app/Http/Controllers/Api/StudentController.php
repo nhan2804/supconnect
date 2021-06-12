@@ -16,7 +16,7 @@ use App\Models\Grade_Type;
 use App\Models\Grade_Book;
 use App\Models\Grade_Book_Details;
 use App\Models\Student_Of_Subject_Class;
-
+use App\Models\Subject_Class;
 
 class StudentController extends Controller
 {
@@ -56,23 +56,22 @@ class StudentController extends Controller
 
     public function gradeStudent($student_id, Request $req) {
 
-        $now = date('Y-m-d');   
+        $now = date('Y-m-d');
         if($req->semester == '' || $req->school_year == '') {
             $subjectResults = Student_Of_Subject_Class::join('subject_class', 'subject_class.subject_class_id', 'student_of_subject_class.subject_class' )
                 ->where('subject_class.date_start', '<=', $now)
                 ->where('subject_class.date_end', '>=', $now)
-                ->where('student_id', $student_id)  
+                ->where('student_id', $student_id)
                 ->select('student_of_subject_class.junction_id', 'student_of_subject_class.subject_class', 'subject_class.subject_id')
                 ->get();
         } else {
             $subjectResults = Student_Of_Subject_Class::join('subject_class', 'subject_class.subject_class_id', 'student_of_subject_class.subject_class' )
             ->where('subject_class.semester', $req->semester)
             ->where('subject_class.school_year', $req->school_year)
-            ->where('student_id', $student_id)  
+            ->where('student_id', $student_id)
             ->select('student_of_subject_class.junction_id', 'student_of_subject_class.subject_class', 'subject_class.subject_id')
             ->get();
         }
-        
         $marks = [];
         foreach($subjectResults as $class) {
 
@@ -88,6 +87,9 @@ class StudentController extends Controller
             $class->point_midTerm = 0;
             $class->point_EndTerm = 0;
             $class->point_10 = 0;
+
+            $lecturer = Subject_Class::find($class->subject_class)->lecturer_id;
+            $class->lecturer = $lecturer;
 
             foreach($grades as $grade) {
                 if($grade->subject_class == $class->subject_class) {
@@ -115,7 +117,7 @@ class StudentController extends Controller
             } else {
                 $class->point_word = 'F';
             }
-            
+
         }
 
         return response()->json([
@@ -138,9 +140,9 @@ class StudentController extends Controller
     }
 
     public function getSubject($student_id) {
-        $now = date('Y-m-d');   
+        $now = date('Y-m-d');
         $subjectResults = Student_Of_Subject_Class::join('subject_class', 'subject_class.subject_class_id', 'student_of_subject_class.subject_class' )
-            ->where('student_of_subject_class.student_id', $student_id) 
+            ->where('student_of_subject_class.student_id', $student_id)
             ->where('subject_class.date_start', '<=', $now)
             ->where('subject_class.date_end', '>=', $now)
             ->select('student_of_subject_class.subject_class', 'subject_class.subject_class_name')
@@ -148,7 +150,16 @@ class StudentController extends Controller
 
         return response()->json([
             'success' => true,
-            'subjects' => $subjectResults   
+            'subjects' => $subjectResults
+        ]);
+    }
+
+    public function cardID($id) {
+        $student = Student::where('card_UID', $id)->first();
+        $student->class = Class_List::find($student->class_id)->class_name;
+        return response()->json([
+            'success' => true,
+            'user' => $student
         ]);
     }
 }
