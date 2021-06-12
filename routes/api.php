@@ -73,7 +73,7 @@ Route::prefix('student')->group(function () {
     Route::get('/grade/{student_id}', 'App\Http\Controllers\Api\StudentController@gradeStudent');
 
     Route::get('/{account_id}', 'App\Http\Controllers\Api\StudentController@show');
-    Route::put('/{account_id}', 'App\Http\Controllers\Api\StudentController@update');
+    Route::put('/{student_id}', 'App\Http\Controllers\Api\StudentController@update');
 
     Route::get('/leavenotice/list/{student_id}', 'App\Http\Controllers\Api\LeaveNoticeController@studentLeaveNotice');
     Route::get('/leavenotice/{student_id}', 'App\Http\Controllers\Api\LeaveNoticeController@show');

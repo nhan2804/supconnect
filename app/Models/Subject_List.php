@@ -9,7 +9,7 @@ class Subject_List extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    // protected $primaryKey = 'subject_id';
+    protected $primaryKey = 'subject_id';
     protected $table = 'subject_list';
     public function list_subject()
     {
