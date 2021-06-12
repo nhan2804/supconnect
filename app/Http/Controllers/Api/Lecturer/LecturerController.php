@@ -23,9 +23,9 @@ class LecturerController extends Controller
         $lecturers = Lecturer::all();
 
         $class_lecturers = DB::table('student_of_subject_class')
+                                ->where('student_id', $request->student_id)
                                 ->join('subject_class', 'subject_class','subject_class_id')
                                 ->join('lecturer', 'subject_class.lecturer_id', 'lecturer.lecturer_id')
-                                ->where('student_id', $request->student_id)
                                 ->select('lecturer.*')
                                 ->get();
 

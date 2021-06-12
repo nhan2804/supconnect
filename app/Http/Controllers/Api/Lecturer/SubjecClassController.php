@@ -91,15 +91,15 @@ class SubjecClassController extends Controller
             }
         }
         return $students = DB::table('subject_class')->where('subject_class.subject_class_id', $id)->where('lecturer_id', 'GVCS002')
-            ->whereDate('time_start', '<=', $now)
-            ->whereDate('time_end', '>=', $now)
+            ->whereDate('date_start', '<=', $now)
+            ->whereDate('date_end', '>=', $now)
             ->join('student_of_subject_class', 'student_of_subject_class.subject_class', 'subject_class.subject_class_id')
             ->join('student', 'student.student_id', 'student_of_subject_class.student_id')
             ->join('roll_call_record_detail', 'student.student_id', 'roll_call_record_detail.student_id')
             ->get();
 
         // dd(DB::getQueryLog());
-        // return $list_std = 
+        // return $list_std =
     }
 
     /**
