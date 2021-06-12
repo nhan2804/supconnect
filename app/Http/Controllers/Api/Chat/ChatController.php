@@ -29,40 +29,46 @@ class ChatController extends Controller
                         ->orWhere('user_2', $req->input('user_id'))
                         ->get();
 
-        foreach($chats as $chat) {
+        foreach($chats as $key => $chat) {
             $message = ChatDetail::where('chat_history_id', $chat->chat_history_id)
             ->orderBy('chat_history_detail_id', 'desc')
             ->first();
-            if($message->type = 'image') {
-                $chat->message = 'Hình ảnh';
-            } elseif($message->type = 'text') {
-                $chat->message = $message->message;
+            if($message==null){
+                unset($chats[$key]);
             }
-            $chat->messageTime = $message->time;
-            if($req->input('user_id') == $chat->user_1) {
-                if(Student::find($chat->user_2)!=null){
-                    $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
-                    $avatar = Student::find($chat->user_2)->avatar;
+            else{
+                if($message->type = 'image') {
+                $chat->message = 'Hình ảnh';
+                } elseif($message->type = 'text') {
+                    $chat->message = $message->message;
                 }
-                else{
-                    $lecturer = Lecturer::find($chat->user_2);
-                    $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' '.$lecturer->last_name_lecturer;
-                    $avatar = Lecturer::find($chat->user_2)->avatar;
+                $chat->messageTime = $message->time;
+                if($req->input('user_id') == $chat->user_1) {
+                    if(Student::find($chat->user_2)!=null){
+                        $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
+                        $avatar = Student::find($chat->user_2)->avatar;
+                    }
+                    else{
+                        $lecturer = Lecturer::find($chat->user_2);
+                        $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' '.$lecturer->last_name_lecturer;
+                        $avatar = Lecturer::find($chat->user_2)->avatar;
+                    }
+                } else {
+                    if(Student::find($chat->user_1)!=null){
+                        $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
+                        $avatar = Student::find($chat->user_1)->avatar;
+                    }
+                    if($name == '') {
+                        $lecturer = Lecturer::find($chat->user_1);
+                        $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer;
+                        $avatar = Lecturer::find($chat->user_1)->avatar;
+                    }
                 }
-            } else {
-                if(Student::find($chat->user_1)!=null){
-                    $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
-                    $avatar = Student::find($chat->user_1)->avatar;
-                }
-                if($name == '') {
-                    $lecturer = Lecturer::find($chat->user_1);
-                    $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer;
-                    $avatar = Lecturer::find($chat->user_1)->avatar;
-                }
+
+                $chat->name = $name;
+                $chat->avatar = $avatar;
             }
 
-            $chat->name = $name;
-            $chat->avatar = $avatar;
         }
 
         return response()->json([
@@ -126,7 +132,7 @@ class ChatController extends Controller
             return $room->id;
         }
     }
-    
+
     public function show($id, Request $req)
     {
         if($id == 0) {
