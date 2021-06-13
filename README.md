@@ -1,3 +1,16 @@
+## Xem điểm
+
+/grade/:id
+GET
+Xem full điểm của id Sinh viên
+// query string $id_sv= $r->id_sv,$id_subject=$r->id_subject
+/grade/:id
+PUT
+Sửa điểm của sv :id là grade_book_detail_id
+/grade
+POST
+Thêm điểm cho sinh viên
+
 ## // prefix api
 
 lecturer/

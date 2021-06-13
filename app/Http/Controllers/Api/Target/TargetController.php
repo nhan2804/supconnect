@@ -119,7 +119,7 @@ class TargetController extends Controller
             $target->subject_class_id = $req->subject_class_id;
             $target->grade_target = $req->grade_target;
         }
-       
+
         $target->save();
 
         $validAdvice = AdviceTarget::where('target_id', $target->target_id)->get();
@@ -187,9 +187,9 @@ class TargetController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id, Request $req)
-    {   
-        $now = date('Y-m-d');   
-    
+    {
+        $now = date('Y-m-d');
+
         $targets = Target::where('student_id', $req->input('student_id'))->get();
         foreach($targets as $target) {
             $grades = Grade_Book::join('grade_book_detail', 'grade_book_detail.grade_book_id', 'grade_book.grade_book_id')
@@ -203,7 +203,7 @@ class TargetController extends Controller
             }
             $target->currentGrade = $currentGrade;
         }
-        
+
         return response()->json([
             'success' => true,
             'targets' => $targets

@@ -8,6 +8,7 @@ use App\Models\Chat;
 use App\Models\Student;
 use App\Models\Lecturer;
 use App\Models\ChatDetail;
+use App\Models\Class_List;
 use App\Models\Faculty;
 use App\Models\Lecturer_Degree_Type;
 use Illuminate\Support\Facades\Auth;
@@ -28,32 +29,38 @@ class ChatController extends Controller
             ->orWhere('user_2', $req->input('user_id'))
             ->get();
 
-        foreach ($chats as $key => $chat) {
+        foreach($chats as $key => $chat) {
             $message = ChatDetail::where('chat_history_id', $chat->chat_history_id)
-                ->orderBy('chat_history_detail_id', 'desc')
-                ->first();
-            if ($message == null) {
+            ->orderBy('chat_history_detail_id', 'desc')
+            ->first();
+            if($message==null){
                 unset($chats[$key]);
-            } else {
-                $chat->message = $message->message;
+            }
+            else{
+                if($message->type = 'image') {
+                $chat->message = 'Hình ảnh';
+                } elseif($message->type = 'text') {
+                    $chat->message = $message->message;
+                }
                 $chat->messageTime = $message->time;
-                if ($req->input('user_id') == $chat->user_1) {
-                    if (Student::find($chat->user_2) != null) {
-                        $name = Student::find($chat->user_2)->first_name . ' ' . Student::find($chat->user_2)->last_name;
+                if($req->input('user_id') == $chat->user_1) {
+                    if(Student::find($chat->user_2)!=null){
+                        $name = Student::find($chat->user_2)->first_name .' ' .Student::find($chat->user_2)->last_name;
                         $avatar = Student::find($chat->user_2)->avatar;
-                    } else {
+                    }
+                    else{
                         $lecturer = Lecturer::find($chat->user_2);
-                        $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation . '' . $lecturer->first_name_lecturer . ' ' . $lecturer->last_name_lecturer;
+                        $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' '.$lecturer->last_name_lecturer;
                         $avatar = Lecturer::find($chat->user_2)->avatar;
                     }
                 } else {
-                    if (Student::find($chat->user_1) != null) {
-                        $name = Student::find($chat->user_1)->first_name . ' ' . Student::find($chat->user_1)->last_name;
+                    if(Student::find($chat->user_1)!=null){
+                        $name = Student::find($chat->user_1)->first_name .' ' .Student::find($chat->user_1)->last_name;
                         $avatar = Student::find($chat->user_1)->avatar;
                     }
-                    if ($name == '') {
+                    if($name == '') {
                         $lecturer = Lecturer::find($chat->user_1);
-                        $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation . '' . $lecturer->first_name_lecturer . ' ' . $lecturer->last_name_lecturer;
+                        $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer;
                         $avatar = Lecturer::find($chat->user_1)->avatar;
                     }
                 }
@@ -61,6 +68,7 @@ class ChatController extends Controller
                 $chat->name = $name;
                 $chat->avatar = $avatar;
             }
+
         }
         return response()->json([
             'success' => true,
@@ -100,13 +108,39 @@ class ChatController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    function checkIsValidRoom($user_1, $user_2) {
+        $room = Chat::where([
+            ['user_1', '=', $user_1 ],
+            ['user_2', '=', $user_2 ]
+        ])->orWhere([
+            ['user_1', '=', $user_2 ],
+            ['user_2', '=', $user_1 ]
+        ])->first();
+        $isHasRoom = false;
+        if(isset($room)) {
+            $isHasRoom = true;
+            return $room->chat_history_id;
+        }
+
+        if(!$isHasRoom) {
+            $room = new Chat();
+            $room->user_1 = $user_1;
+            $room->user_2 = $user_2;
+            $room->save();
+            return $room->id;
+        }
+    }
+
     public function show($id, Request $req)
     {
-
+        if($id == 0) {
+            $id = $this->checkIsValidRoom($req->user_1, $req->user_2);
+        }
         $chat = Chat::find($id);
-        if ($req->input('user_id') == $chat->user_1) {
-            if (Student::find($chat->user_2) != null) {
-                $name = Student::find($chat->user_2)->first_name . ' ' . Student::find($chat->user_2)->last_name;
+        if($req->input('user_1') == $chat->user_1) {
+            if(Student::find($chat->user_2)!=null){
+                $name = Student::find($chat->user_2)->first_name .' '.Student::find($chat->user_2)->last_name;
                 $avatar = Student::find($chat->user_2)->avatar;
                 $faculty = Class_List::find(Student::find($chat->user_2)->class_id)->class_name;
             } else {

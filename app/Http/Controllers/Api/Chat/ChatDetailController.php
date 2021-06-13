@@ -4,9 +4,16 @@ namespace App\Http\Controllers\Api\Chat;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use DB;
-use App\Models\ChatDetail;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Chat;
+use App\Models\Student;
+use App\Models\Lecturer;
+use App\Models\ChatDetail;
+use App\Models\Class_List;
+use App\Models\Faculty;
+use App\Models\Lecturer_Degree_Type;
+use Illuminate\Support\Facades\Auth;
+use DB;
 
 class ChatDetailController extends Controller
 {
@@ -37,10 +44,19 @@ class ChatDetailController extends Controller
     public function store(Request $req)
     {
         $new = new ChatDetail;
+        if($req->type == 'text') {
+            $new->message = $req->message;
+        } elseif ($req->type == 'image') {
+            $image = str_replace('data:image/jpeg;base64,', '', $req->message);
+            $image = str_replace(' ', '+', $image);
+            $imageName = time().'.'.'jpg';
+            Storage::disk('store_message')->put($imageName, base64_decode($image));
+            $new->message = 'store/messages/' .$imageName;
+        }
+        $new->type = $req->type;
         $new->chat_history_id = $req->id_chat;
         $new->sender_id = $req->sender_id;
-        $new->message = $req->message;
-        $new->time =  date("Y-m-d h:i:s");
+        $new->time = date("Y-m-d h:i:s");
 
         if (!$new->save()) return response()->json(['message' => "Error"], 500);
         return response()->json($new, 200);
@@ -81,11 +97,41 @@ class ChatDetailController extends Controller
         if($id == 0) {
             $id = $this->checkIsValidRoom($req->user_1, $req->user_2);
         }
-        $details = ChatDetail::where('chat_history_id', $id)->get();
-        foreach($details as $detail) {
-
+        $chat = Chat::find($id);
+        if($req->input('user_1') == $chat->user_1) {
+            if(Student::find($chat->user_2)!=null){
+                $name = Student::find($chat->user_2)->first_name .' '.Student::find($chat->user_2)->last_name;
+                $avatar = Student::find($chat->user_2)->avatar;
+                $faculty = Class_List::find(Student::find($chat->user_2)->class_id)->class_name;
+            }
+            else{
+                $lecturer = Lecturer::find($chat->user_2);
+                $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer;
+                $avatar = $lecturer->avatar;
+                $faculty = 'Khoa '.Faculty::find($lecturer->faculty_id)->faculty_name;
+            }
+        } else {
+            if(Student::find($chat->user_1)!=null){
+                $name = Student::find($chat->user_1)->first_name .' '.Student::find($chat->user_1)->last_name;
+                $avatar = Student::find($chat->user_1)->avatar;
+                $faculty = Class_List::find(Student::find($chat->user_2)->class_id)->class_name;
+            }
+            else{
+                $lecturer = Lecturer::find($chat->user_1);
+                $name = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation.''.$lecturer->first_name_lecturer .' ' .$lecturer->last_name_lecturer;
+                $avatar = $lecturer->avatar;
+                $faculty = Faculty::find($lecturer->faculty_id)->faculty_name;
+            }
         }
-        return response()->json($detail, 200);
+        $details = ChatDetail::where('chat_history_id', $id)->get();
+        
+        return response()->json([
+            'success' => true,
+            'name' => $name,
+            'avatar' =>$avatar,
+            'faculty' =>$faculty,
+            'messages' => $details
+        ], 200);
         // dd(DB::getQueryLog());
     }
 

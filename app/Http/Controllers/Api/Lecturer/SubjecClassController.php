@@ -7,6 +7,7 @@ use App\Models\Record\Record;
 use App\Models\Record\RecordDetail;
 use App\Models\Subject_Class;
 use App\Models\Subject_List;
+use App\Models\TimeTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -17,15 +18,24 @@ class SubjecClassController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $req)
     {
-        $list_subj = Subject_List::with(['list_subject' => function ($query) {
-            return $query->where('lecturer_id', 'GVCS002');
-        }])->get()->toArray();
-
-        return array_filter($list_subj, function ($e) {
-            return count($e['list_subject']);
-        });
+        $now = date('Y-m-d');
+        $subjects = TimeTable::join('subject_class', 'subject_class.subject_class_id', 'timetable.subject_class_id')
+        ->where('subject_class.lecturer_id', $req->lecturer_id)
+        ->where('subject_class.date_start', '<=', $now)
+        ->where('subject_class.date_end', '>=', $now)
+        ->get();
+        if($subjects->count() == 0) {
+            return response()->json([
+                'success' => false,
+                'timetables' => $subjects
+            ]);
+        }
+        return response()->json([
+            'success' => true,
+            'timetables' => $subjects
+        ]);
     }
 
     /**
@@ -57,17 +67,20 @@ class SubjecClassController extends Controller
      */
     public function show($id, Request $r)
     {
-
         $now = date('Y-m-d');
         if ($r->date) $now = $r->date;
 
         // DB::enableQueryLog();
-        $students = DB::table('subject_class')->where('subject_class.subject_class_id', $id)->where('lecturer_id', 'GVCS002')
+        $students = DB::table('subject_class')
+            ->where('subject_class.subject_class_id', $id)
+            ->where('lecturer_id', 'GVCS002')
             ->join('student_of_subject_class', 'student_of_subject_class.subject_class', 'subject_class.subject_class_id')
             ->join('student', 'student.student_id', 'student_of_subject_class.student_id')
             ->get();
         // $sb = Subject_Class::where('subject_class_id', $id)->where('lecturer_id', 'GVCS002')->first();
-        $check = DB::table('subject_class')->where('subject_class.subject_class_id', $id)->where('lecturer_id', 'GVCS002')
+        $check = DB::table('subject_class')
+            ->where('subject_class.subject_class_id', $id)
+            ->where('lecturer_id', 'GVCS002')
             ->join('roll_call_record', 'roll_call_record.subject_class', 'subject_class.subject_class_id')
             ->where('date', $now)->first();
         //check xem đã vào điểm danh chưa
@@ -90,6 +103,7 @@ class SubjecClassController extends Controller
                 $n->save();
             }
         }
+
         $students = DB::table('subject_class')->where('subject_class.subject_class_id', $id)->where('lecturer_id', 'GVCS002')
             ->whereDate('date_start', '<=', $now)
             ->whereDate('date_end', '>=', $now)
@@ -110,7 +124,7 @@ class SubjecClassController extends Controller
             'students'=>$students,
         ], 200);
         // dd(DB::getQueryLog());
-        // return $list_std = 
+        // return $list_std =
     }
 
     /**
