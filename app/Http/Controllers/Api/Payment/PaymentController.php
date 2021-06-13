@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account_Balance;
 use App\Models\Payment\Payment;
 use App\Models\Payment\PaymentDetail;
 use App\Models\Student;
@@ -19,41 +20,32 @@ class PaymentController extends Controller
 
     public function index(Request $request)
     {
-        $student = Student::where('account_id', $request->acc_id)->first();
-
-        $payments = Payment::where('user_id', $student->student_id)->get();
-
+        $student = Student::find($request->student_id);
+        $balance = Account_Balance::where('account_id', $student->account_id)->first()->balance;
+        $payments = Payment::where('user_id', $request->student_id)->get();
         foreach ($payments as $payment) {
             $payment->type_name = DB::table('transaction_type')
                 ->where('transaction_type_id', $payment->transaction_type_id)->first()->transaction_type_name;
             if ($payment->transaction_type_id == 2) {
-                $payment->category_name = $this->getCateName($payment);
+                $payment->type_name = $this->getCateName($payment);
             }
+            $payment->amount = number_format($payment->amount,0,",",".");
         }
 
         return response()->json([
             'success' => true,
+            'balance' => number_format($balance,0,",","."),
+            'student_name' => $student->first_name.' '.$student->last_name,
+            'student_id' => $student->student_id,
             'payments' => $payments
         ], 200);
     }
 
     private function getCateName($payment)
     {
-        $cateID = PaymentDetail::where('transaction_history_id', $payment->transaction_history_id)
-            ->first()->transaction_category_id;
         $name = DB::table('transaction_category')
-            ->where('transaction_category_id', $cateID)->pluck('transaction_category_name')[0];
+            ->where('transaction_category_id', $payment->transaction_category)->pluck('transaction_category_name')[0];
         return  $name;
-    }
-
-    public function detail(Request $request)
-    {
-        $detail = PaymentDetail::where('transaction_history_id', $request->id)->first();
-
-        return response()->json([
-            'success' => true,
-            'detail' => $detail
-        ]);
     }
 
     /**
@@ -72,30 +64,49 @@ class PaymentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+    /**
+     * Request params:
+     *  - acc_id : account_id
+     *  - type: type of the transaction, recharge or pay
+     *  - amount: how much currency is recharged or spent
+     *  - category: category of the transaction. Payment only
+     *  - description: description of the transaction, obviously
+     */
     public function store(Request $request)
     {
         $student = Student::where('account_id', $request->acc_id)->first();
+
+        $acc_balance = Account_Balance::where('account_id', $request->acc_id)->first();
 
         $newPayment = new Payment;
         $newPayment->user_id = $student->student_id;
         $newPayment->transaction_type_id = $request->type;
         $newPayment->date = date('Y-m-d h:i:s');
         $newPayment->amount = $request->amount;
-
+        $newPayment->transaction_category = $request->category ? $request->category : null;
+        $newPayment->description = $request->description ? $request->description : "";
         $newPayment->save();
 
-        $newDetail = new PaymentDetail;
+        $oldBalance = $acc_balance->balance;
 
-        $newDetail->transaction_history_id = $newPayment->transaction_history_id;
-        $newDetail->transaction_category_id = $request->category;
-        $newDetail->amount = $request->amount;
-        $newDetail->description = $request->description;
+        $newBalance = 0;
+        if($newPayment->transaction_type_id == 1) {
+            $newBalance = $oldBalance + $newPayment->amount;
+        }
+        if($newPayment->transaction_type_id == 2) {
+            $newBalance = $oldBalance - $newPayment->amount;
+        }
+        $acc_balance->balance = $newBalance;
 
-        if ($newDetail->save())
+        if ($newDetail->save() && $acc_balance->update([
+            'amount' => $newBalance
+        ]))
             return response()->json([
                 'success' => true,
                 'payment' => $newPayment,
-                'detail' => $newDetail
+                'detail' => $newDetail,
+                'balance' => $acc_balance
             ], 200);
 
         return response()->json([

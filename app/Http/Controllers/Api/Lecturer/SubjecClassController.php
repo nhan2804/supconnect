@@ -9,7 +9,7 @@ use App\Models\Subject_Class;
 use App\Models\Subject_List;
 use App\Models\TimeTable;
 use Illuminate\Http\Request;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class SubjecClassController extends Controller
 {
@@ -103,16 +103,28 @@ class SubjecClassController extends Controller
                 $n->save();
             }
         }
-        return $students = DB::table('subject_class')->where('subject_class.subject_class_id', $id)->where('lecturer_id', 'GVCS002')
+
+        $students = DB::table('subject_class')->where('subject_class.subject_class_id', $id)->where('lecturer_id', 'GVCS002')
             ->whereDate('date_start', '<=', $now)
             ->whereDate('date_end', '>=', $now)
             ->join('student_of_subject_class', 'student_of_subject_class.subject_class', 'subject_class.subject_class_id')
             ->join('student', 'student.student_id', 'student_of_subject_class.student_id')
             ->join('roll_call_record_detail', 'student.student_id', 'roll_call_record_detail.student_id')
+            ->join('class_list', 'class_list.class_id' ,'student.class_id')
+            ->select('student.*','roll_call_record_detail.is_attend','class_list.class_name')
             ->get();
+        $subject_class = Subject_Class::where('subject_class_id', $id)->first();
 
+        return response()->json([
+            'success'=>true,
+            'subject_class'=>$subject_class->subject_class_name,
+            'semeter'=>$subject_class->semester,
+            'year'=> explode('-',$now)[0],
+            'date'=> $now,
+            'students'=>$students,
+        ], 200);
         // dd(DB::getQueryLog());
-        // return $list_std = 
+        // return $list_std =
     }
 
     /**
