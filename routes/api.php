@@ -34,7 +34,6 @@ Route::resource('chat', ChatController::class);
 Route::resource('chat-details', ChatDetailController::class);
 Route::resource('target', TargetController::class);
 Route::resource('payment', PaymentController::class);
-Route::resource('lecturer', LecturerController::class);
 // extra route to get details of the paymet
 Route::get('paymentdetail', [PaymentController::class, 'detail']);
 
@@ -45,6 +44,7 @@ Route::prefix('lecturer')->group(function () {
     Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
     Route::resource('announcement', AnnouncementController::class);
 });
+Route::resource('lecturer', LecturerController::class);
 //endchat
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
