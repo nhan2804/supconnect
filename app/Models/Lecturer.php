@@ -12,4 +12,11 @@ class Lecturer extends Model
     public $timestamps = false;
     protected $primaryKey = 'lecturer_id';
     protected $table = 'lecturer';
+    protected $fillable = [
+        'first_name_lecturer',
+        'last_name_lecturer',
+        'date_of_birth',
+        'phone_number_lecturer',
+        'email',
+    ];
 }
