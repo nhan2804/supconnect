@@ -36,6 +36,7 @@ Route::resource('chat-details', ChatDetailController::class);
 Route::resource('target', TargetController::class);
 Route::resource('payment', PaymentController::class);
 Route::resource('lecturer', LecturerController::class);
+
 Route::resource('record', RecordController::class);
 Route::prefix('lecturer')->group(function () {
     Route::resource('/', LecturerController::class);
@@ -43,7 +44,9 @@ Route::prefix('lecturer')->group(function () {
     Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
     Route::resource('announcement', AnnouncementController::class);
 });
+
 Route::resource('grade', GradeController::class);
+
 //endchat
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
@@ -72,7 +75,7 @@ Route::prefix('student')->group(function () {
     Route::get('/grade/{student_id}', 'App\Http\Controllers\Api\StudentController@gradeStudent');
 
     Route::get('/{account_id}', 'App\Http\Controllers\Api\StudentController@show');
-    Route::put('/{account_id}', 'App\Http\Controllers\Api\StudentController@update');
+    Route::put('/{student_id}', 'App\Http\Controllers\Api\StudentController@update');
 
     Route::get('/leavenotice/list/{student_id}', 'App\Http\Controllers\Api\LeaveNoticeController@studentLeaveNotice');
     Route::get('/leavenotice/{student_id}', 'App\Http\Controllers\Api\LeaveNoticeController@show');

@@ -10,9 +10,12 @@ use Auth;
 use Hash;
 use App\Models\Account;
 use App\Models\Student;
+use App\Models\Lecturer;
+use App\Models\Lecturer_Degree_Type;
 use App\Models\Account_Role;
 use App\Models\Class_List;
 use App\Models\User;
+use App\Models\Faculty;
 use Session;
 use DB;
 
@@ -27,25 +30,23 @@ class AuthController extends Controller
 
         Auth::login($account);
 
+        $student = null;
+        $lecturer = null;
         $role = Account_Role::where('account_id', Auth::user()->account_id)->first()->role_id;
         if ($role == 1) {
             $student = Student::where('account_id', $account->account_id)->first();
-            $account->student_id = $student->student_id;
-            $account->first_name = $student->first_name;
-            $account->last_name = $student->last_name;
-            $account->date_of_birth = $student->date_of_birth;
-            $account->phone_number = $student->phone_number;
-            $account->start_year = $student->start_year;
-            $account->end_year = $student->end_year;
-            $account->class_id = $student->class_id;
-            $account->email = $student->email;
-            $account->avatar = $student->avatar;
-            $account->class = Class_List::find($account->class_id)->class_name;
+            $student->class = Class_List::find($student->class_id)->class_name;
+        } else if($role == 2) {
+            $lecturer = Lecturer::where('account_id', $account->account_id)->first();
+            $lecturer->degree = Lecturer_Degree_Type::find($lecturer->degree)->degree_type_name;
+            $lecturer->faculty = Faculty::find($lecturer->faculty_id)->faculty_name;
         }
 
         return response()->json([
             'success' => true,
-            'user' => $account,
+            'role' => $role,
+            'student' => $student,
+            'lecturer' => $lecturer,
         ]);
     }
 

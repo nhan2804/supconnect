@@ -74,10 +74,14 @@ class LecturerController extends Controller
      * @param  \App\Models\Lecturer  $lecturer
      * @return \Illuminate\Http\Response
      */
-    public function show(Lecturer $lecturer)
-
+    public function show($lecturer_id)
     {
-        //
+        $lecturer = Lecturer::where('lecturer_id', $lecturer_id)->first();
+
+        return response()->json([
+            'success' => true,
+            'user' => $lecturer,
+        ]);
     }
 
     /**
@@ -98,9 +102,17 @@ class LecturerController extends Controller
      * @param  \App\Models\Lecturer  $lecturer
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Lecturer $lecturer)
+    public function update(Request $request, $lecturer_id)
     {
-        //
+        $lecturer = Lecturer::where('lecturer_id', $lecturer_id)->first();
+        if($lecturer) {
+            $lecturer->update($request->all());
+            return $this->show($lecturer_id);
+        }
+        return response()->json([
+            'success' => true,
+            'message' => 'lecturer_id is not valid'
+        ]);
 
     }
 
