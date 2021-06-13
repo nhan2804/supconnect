@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Record\RecordController;
 use App\Http\Controllers\Api\Lecturer\SubjecClassController;
 use App\Http\Controllers\Api\Lecturer\AnnouncementController;
 use App\Http\Controllers\Api\Lecturer\LecturerController;
+use App\Http\Controllers\Grade\GradeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +43,7 @@ Route::prefix('lecturer')->group(function () {
     Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
     Route::resource('announcement', AnnouncementController::class);
 });
+Route::resource('grade', GradeController::class);
 //endchat
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
