@@ -30,8 +30,8 @@ class LecturerController extends Controller
                                 ->get();
 
         foreach ($lecturers as $lecturer){
-            $degree = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation;
-            $lecturer->name = $degree.''.$lecturer->first_name_lecturer.' '.$lecturer->last_name_lecturer;
+            $lecturer->degree = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation;
+            $lecturer->name = $lecturer->degree.''.$lecturer->first_name_lecturer.' '.$lecturer->last_name_lecturer;
         }
 
         foreach($class_lecturers as $class_lecturer){
