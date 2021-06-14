@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Subject_Class extends Model
 {
     use HasFactory;
+    protected $keyType = 'string';
     public $timestamps = false;
     protected $primaryKey = 'subject_class_id';
     protected $table = 'subject_class';
