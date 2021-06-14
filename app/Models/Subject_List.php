@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Subject_List extends Model
 {
     use HasFactory;
+    protected $keyType = 'string';
     public $timestamps = false;
     protected $primaryKey = 'subject_id';
     protected $table = 'subject_list';

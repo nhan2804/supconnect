@@ -37,6 +37,42 @@ class SubjecClassController extends Controller
             'timetables' => $subjects
         ]);
     }
+    public function getSubjectClassofLecturer(Request $request){
+        $now = date('Y-m-d');
+        $subject_lists = SUbject_List::all();
+        if($request->semester == '' || $request->school_year == '') {
+            foreach($subject_lists as $key => $subject_list){
+                $subject_list->subject_classes = Subject_Class::where('lecturer_id',$request->lecturer_id)
+                ->where('subject_id', $subject_list->subject_id)
+                ->where('date_start', '<=', $now)
+                ->where('date_end', '>=', $now)
+                ->get();
+                if($subject_list->subject_classes->count()==0){
+                    unset($subject_lists[$key]);
+                }
+            }
+        }
+        else{
+            foreach($subject_lists as $key => $subject_list){
+                $subject_list->subject_classes = Subject_Class::where('lecturer_id',$request->lecturer_id)
+                ->where('subject_id', $subject_list->subject_id)
+                ->where('semester', $request->semester)
+                ->where('school_year', $request->school_year)
+                ->get();
+                if($subject_list->subject_classes->count()==0){
+                    unset($subject_lists[$key]);
+                }
+            }
+        }
+        $arr = [];
+        foreach($subject_lists as $subject) {
+            array_push($arr, $subject);
+        }
+        return response()->json([
+            'success' => true,
+            'subject_lists' => $arr
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.
