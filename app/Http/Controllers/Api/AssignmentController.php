@@ -70,6 +70,13 @@ class AssignmentController extends Controller
             array_push($arr, $item);
         }
 
+        if($assignments->count() == 0) {
+            return response()->json([
+                'success' => false,
+                'assignments' => $arr
+            ]);
+        }
+
         return response()->json([
             'success' => true,
             'assignments' => $arr

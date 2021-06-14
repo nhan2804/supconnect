@@ -25,7 +25,6 @@ class AnnouncementController extends Controller
             ->orderBy('announcement.announcement_id', 'desc')
             ->get();
 
-
         return response()->json([
             'success' => true,
             'announcement' => $announcements
@@ -40,7 +39,37 @@ class AnnouncementController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $now = date('Y-m-d H:i:s');
+        $annoucement = new Announcement();
+        $annoucement->announcement_type_id = $request->type;
+        $annoucement->title = $request->title;
+        if($request->create_date != '') {
+            $annoucement->create_date = date('Y-m-d', strtotime($request->create_date));
+        } else {
+            $annoucement->create_date = $now;
+        }
+        $annoucement->description = $request->description;
+        // $annoucement->attachment = $request->attachment;
+        
+        if($annoucement->save()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'create new announcement succesful'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'create new announcement failed'
+        ]);
+
+    }
+
+    public function announcementType() {
+        return response()->json([
+            'success' => true,
+            'type' => Announcement_Type::all()
+        ]);
     }
 
     /**

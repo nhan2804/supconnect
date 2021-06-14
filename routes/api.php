@@ -37,14 +37,24 @@ Route::prefix('lecturer')->group(function () {
     Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
     Route::resource('announcement', LecturerAnnouncementController::class);
 });
+
+Route::post('announcement', 'App\Http\Controllers\Api\AnnouncementController@store');
+Route::get('announcement/type', 'App\Http\Controllers\Api\AnnouncementController@announcementType');
+
 // For all user can view Announcement
 Route::resource('announcement', AnnouncementController::class);
+
 // Chat
 Route::resource('todo', TodoController::class);
 Route::resource('chat', ChatController::class);
 Route::resource('chat-details', ChatDetailController::class);
 Route::resource('target', TargetController::class);
 Route::resource('payment', PaymentController::class);
+// extra route to get details of the paymet
+Route::get('paymentdetail', [PaymentController::class, 'detail']);
+
+Route::resource('record', RecordController::class);
+
 Route::resource('lecturer', LecturerController::class);
 
 Route::resource('record', RecordController::class);
