@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AnnouncementController as AnnouncementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TodoController;
@@ -9,7 +10,7 @@ use App\Http\Controllers\Api\Target\TargetController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Record\RecordController;
 use App\Http\Controllers\Api\Lecturer\SubjecClassController;
-use App\Http\Controllers\Api\Lecturer\AnnouncementController;
+use App\Http\Controllers\Api\Lecturer\AnnouncementController as LecturerAnnouncementController;
 use App\Http\Controllers\Api\Lecturer\LecturerController;
 use App\Http\Controllers\Grade\GradeController;
 
@@ -32,15 +33,17 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 
 Route::prefix('lecturer')->group(function () {
     Route::resource('/', LecturerController::class);
-    Route::get('subject-class/class_list', [SubjecClassController::class, 'getSubjectClassofLecturer']);
     Route::resource('subject-class', SubjecClassController::class);
     Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
-    Route::resource('announcement', AnnouncementController::class);
+    Route::resource('announcement', LecturerAnnouncementController::class);
 });
 
 Route::post('announcement', 'App\Http\Controllers\Api\AnnouncementController@store');
 Route::post('assignment', 'App\Http\Controllers\Api\AssignmentController@store');
 Route::get('announcement/type', 'App\Http\Controllers\Api\AnnouncementController@announcementType');
+
+// For all user can view Announcement
+Route::resource('announcement', AnnouncementController::class);
 
 // Chat
 Route::resource('todo', TodoController::class);
@@ -58,7 +61,7 @@ Route::resource('lecturer', LecturerController::class);
 Route::resource('record', RecordController::class);
 
 Route::resource('grade', GradeController::class);
-
+Route::get('grade/{id}/getcol', [GradeController::class, 'getSubjectGradeBookId']);
 //endchat
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

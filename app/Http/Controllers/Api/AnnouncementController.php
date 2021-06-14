@@ -16,12 +16,19 @@ class AnnouncementController extends Controller
      */
     public function index()
     {
-        $announcement = Announcement::join('announcement_type', 'announcement_type.announcement_type_id', 'announcement.announcement_type_id')->orderBy('announcement.announcement_id', 'desc')->get();
+        $announcements =
+            Announcement::join(
+                'announcement_type',
+                'announcement_type.announcement_type_id',
+                'announcement.announcement_type_id'
+            )
+            ->orderBy('announcement.announcement_id', 'desc')
+            ->get();
 
         return response()->json([
             'success' => true,
-            'announcement' => $announcement
-        ]);
+            'announcement' => $announcements
+        ], 200);
     }
 
     /**
@@ -73,7 +80,11 @@ class AnnouncementController extends Controller
      */
     public function show($id)
     {
-        $announcement = Announcement::join('announcement_type', 'announcement_type.announcement_type_id', 'announcement.announcement_type_id')
+        $announcement = Announcement::join(
+            'announcement_type',
+            'announcement_type.announcement_type_id',
+            'announcement.announcement_type_id'
+        )
             ->orderBy('announcement.announcement_id', 'desc')
             ->where('announcement_id', $id)
             ->get();
