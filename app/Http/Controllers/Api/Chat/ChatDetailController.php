@@ -97,6 +97,7 @@ class ChatDetailController extends Controller
         if($id == 0) {
             $id = $this->checkIsValidRoom($req->user_1, $req->user_2);
         }
+
         $chat = Chat::find($id);
         if($req->input('user_1') == $chat->user_1) {
             if(Student::find($chat->user_2)!=null){
@@ -124,7 +125,7 @@ class ChatDetailController extends Controller
             }
         }
         $details = ChatDetail::where('chat_history_id', $id)->get();
-        
+
         return response()->json([
             'success' => true,
             'name' => $name,

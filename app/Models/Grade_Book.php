@@ -11,4 +11,8 @@ class Grade_Book extends Model
     public $timestamps = false;
     protected $primaryKey = 'grade_book_id';
     protected $table = 'grade_book';
+    public function type()
+    {
+        return $this->belongsTo(Grade_Type::class, 'grade_type', 'type_id');
+    }
 }

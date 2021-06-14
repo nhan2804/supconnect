@@ -23,14 +23,15 @@ class LecturerController extends Controller
         $lecturers = Lecturer::all();
 
         $class_lecturers = DB::table('student_of_subject_class')
+                                ->where('student_id', $request->student_id)
                                 ->join('subject_class', 'subject_class','subject_class_id')
                                 ->join('lecturer', 'subject_class.lecturer_id', 'lecturer.lecturer_id')
-                                ->where('student_id', $request->student_id)
+                                ->select('lecturer.*')
                                 ->get();
 
         foreach ($lecturers as $lecturer){
-            $degree = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation;
-            $lecturer->name = $degree.''.$lecturer->first_name_lecturer.' '.$lecturer->last_name_lecturer;
+            $lecturer->degree = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation;
+            $lecturer->name = $lecturer->degree.''.$lecturer->first_name_lecturer.' '.$lecturer->last_name_lecturer;
         }
 
         foreach($class_lecturers as $class_lecturer){
