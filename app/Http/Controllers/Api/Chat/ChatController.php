@@ -155,7 +155,7 @@ class ChatController extends Controller
             if(Student::find($chat->user_1)!=null){
                 $name = Student::find($chat->user_1)->first_name .' '.Student::find($chat->user_1)->last_name;
                 $avatar = Student::find($chat->user_1)->avatar;
-                $faculty = Class_List::find(Student::find($chat->user_2)->class_id)->class_name;
+                $faculty = Class_List::find(Student::find($chat->user_1)->class_id)->class_name;
             }
             else{
                 $lecturer = Lecturer::find($chat->user_1);
