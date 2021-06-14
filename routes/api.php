@@ -28,6 +28,13 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
 
 header("Access-Control-Allow-Headers: X-Requested-With");
+
+Route::prefix('lecturer')->group(function () {
+    Route::resource('/', LecturerController::class);
+    Route::resource('subject-class', SubjecClassController::class);
+    Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
+    Route::resource('announcement', AnnouncementController::class);
+});
 // Chat
 Route::resource('todo', TodoController::class);
 Route::resource('chat', ChatController::class);
@@ -38,12 +45,7 @@ Route::resource('payment', PaymentController::class);
 Route::get('paymentdetail', [PaymentController::class, 'detail']);
 
 Route::resource('record', RecordController::class);
-Route::prefix('lecturer')->group(function () {
-    Route::resource('/', LecturerController::class);
-    Route::resource('subject-class', SubjecClassController::class);
-    Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
-    Route::resource('announcement', AnnouncementController::class);
-});
+
 Route::resource('lecturer', LecturerController::class);
 //endchat
 Route::middleware('auth:api')->get('/user', function (Request $request) {
