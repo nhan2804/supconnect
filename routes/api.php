@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AnnouncementController as AnnouncementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TodoController;
@@ -9,7 +10,7 @@ use App\Http\Controllers\Api\Target\TargetController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Record\RecordController;
 use App\Http\Controllers\Api\Lecturer\SubjecClassController;
-use App\Http\Controllers\Api\Lecturer\AnnouncementController;
+use App\Http\Controllers\Api\Lecturer\AnnouncementController as LecturerAnnouncementController;
 use App\Http\Controllers\Api\Lecturer\LecturerController;
 use App\Http\Controllers\Grade\GradeController;
 
@@ -29,6 +30,15 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
 
 header("Access-Control-Allow-Headers: X-Requested-With");
+
+Route::prefix('lecturer')->group(function () {
+    Route::resource('/', LecturerController::class);
+    Route::resource('subject-class', SubjecClassController::class);
+    Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
+    Route::resource('announcement', LecturerAnnouncementController::class);
+});
+// For all user can view Announcement
+Route::resource('announcement', AnnouncementController::class);
 // Chat
 Route::resource('todo', TodoController::class);
 Route::resource('chat', ChatController::class);
@@ -38,12 +48,6 @@ Route::resource('payment', PaymentController::class);
 Route::resource('lecturer', LecturerController::class);
 
 Route::resource('record', RecordController::class);
-Route::prefix('lecturer')->group(function () {
-    Route::resource('/', LecturerController::class);
-    Route::resource('subject-class', SubjecClassController::class);
-    Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
-    Route::resource('announcement', AnnouncementController::class);
-});
 
 Route::resource('grade', GradeController::class);
 
