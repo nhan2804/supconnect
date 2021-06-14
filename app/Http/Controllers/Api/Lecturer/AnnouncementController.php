@@ -34,6 +34,13 @@ class AnnouncementController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+     /**
+      * type: type of the announcement. There is 6 type in database.
+        title: title of the announcement
+        description: content of the announcement
+        attachment: additional files. currently unsupported.
+      */
     public function store(Request $r)
     {
         $new = new Announcement;
@@ -42,8 +49,16 @@ class AnnouncementController extends Controller
         $new->create_date = date('Y-m-d H:i:s');
         $new->description = $r->description;
         $new->attachment = 'none';
-        if ($new->save()) return response()->json(['message' => 'Thành công']);
-        return response()->json(['message' => 'Có lỗi'], 500);
+        if ($new->save()) 
+            return response()->json([
+                'success' => true,
+                'message' => 'Announcement sent',
+                'announcement' => $new
+            ], 200);
+        
+        return response()->json([
+            'message' => 'Error, Announcement cancelled'
+            ], 500);
     }
 
     /**
