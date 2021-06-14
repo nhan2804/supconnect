@@ -30,7 +30,6 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
 
 header("Access-Control-Allow-Headers: X-Requested-With");
-<<<<<<< HEAD
 
 Route::prefix('lecturer')->group(function () {
     Route::resource('/', LecturerController::class);
@@ -41,15 +40,6 @@ Route::prefix('lecturer')->group(function () {
 // For all user can view Announcement
 Route::resource('announcement', AnnouncementController::class);
 // Chat
-=======
-Route::prefix('lecturer')->group(function () {
-    Route::resource('/', LecturerController::class);
-    Route::get('subject-class/class_list', [SubjecClassController::class, 'getSubjectClassofLecturer']);
-    Route::resource('subject-class', SubjecClassController::class);
-    Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
-    Route::resource('announcement', AnnouncementController::class);
-});
->>>>>>> master
 Route::resource('todo', TodoController::class);
 Route::resource('chat', ChatController::class);
 Route::resource('chat-details', ChatDetailController::class);
@@ -60,7 +50,7 @@ Route::resource('lecturer', LecturerController::class);
 Route::resource('record', RecordController::class);
 
 Route::resource('grade', GradeController::class);
-
+Route::get('grade/{id}/getcol', [GradeController::class, 'getSubjectGradeBookId']);
 //endchat
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
