@@ -33,6 +33,7 @@ header("Access-Control-Allow-Headers: X-Requested-With");
 
 Route::prefix('lecturer')->group(function () {
     Route::resource('/', LecturerController::class);
+    Route::get('subject-class/class_list', [SubjecClassController::class, 'getSubjectClassofLecturer']);
     Route::resource('subject-class', SubjecClassController::class);
     Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
     Route::resource('announcement', LecturerAnnouncementController::class);
