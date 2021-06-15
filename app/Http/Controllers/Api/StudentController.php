@@ -159,7 +159,7 @@ class StudentController extends Controller
         $student->class = Class_List::find($student->class_id)->class_name;
         return response()->json([
             'success' => true,
-            'user' => $student
+            'student' => $student
         ]);
     }
 }
