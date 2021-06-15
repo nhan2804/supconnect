@@ -32,6 +32,7 @@ header('Access-Control-Allow-Methods: GET, POST');
 header("Access-Control-Allow-Headers: X-Requested-With");
 
 Route::prefix('lecturer')->group(function () {
+    Route::get('subject-class/class_list', [SubjecClassController::class, 'getSubjectClassofLecturer']);
     Route::resource('/', LecturerController::class);
     Route::resource('subject-class', SubjecClassController::class);
     Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
