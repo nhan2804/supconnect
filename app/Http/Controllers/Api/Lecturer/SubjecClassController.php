@@ -186,9 +186,8 @@ class SubjecClassController extends Controller
      */
     public function update(Request $r, $id)
     {
-        
+        $rec = RecordDetail::findOrFail($id);
         if($r->cardID == '' || $r->cardID == null) {
-            $rec = RecordDetail::findOrFail($id);
             $is = $rec->is_attend == 1 ? 0 : 1;
             $rec->is_attend = $is;
             $rec->save();
