@@ -148,6 +148,8 @@ class SubjecClassController extends Controller
             ->join('student', 'student.student_id', 'student_of_subject_class.student_id')
             ->join('roll_call_record_detail', 'student.student_id', 'roll_call_record_detail.student_id')
             ->join('class_list', 'class_list.class_id' ,'student.class_id')
+            ->join('roll_call_record', 'roll_call_record.record_id' ,'roll_call_record_detail.record_id')
+            ->where('roll_call_record.date', $r->date)
             ->select('student.*', 'roll_call_record_detail.record_detail_id', 'roll_call_record_detail.is_attend','class_list.class_name')
             ->get();
         $subject_class = Subject_Class::where('subject_class_id', $id)->first();
@@ -190,39 +192,16 @@ class SubjecClassController extends Controller
             $is = $rec->is_attend == 1 ? 0 : 1;
             $rec->is_attend = $is;
             $rec->save();
-            return response()->json([
-                'success' => true,
-                'message' => 'attended',
-                'record' => $rec
-                ], 200);
-        } else {
-            $student = Student::where('card_UID',$r->cardID)->first();
-            if($student != null) {
-                $rec = RecordDetail::join('roll_call_record', 'roll_call_record.record_id', 'roll_call_record_detail.record_id')
-                                ->where('roll_call_record_detail.student_id', $student->student_id)
-                                ->first();
-                if($rec == null) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'cardID is not valid',
-                    ]);
-                }
-                
-                $rec->is_attend = 1;
-                $rec->save();
-                return response()->json([
-                    'success' => true,
-                    'message' => 'attended',
-                    'record' => $rec
-                    ], 200);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'cardID is not valid',
-                ]);
-            }
             
+        } else {
+            $rec->is_attend = 1;
+            $rec->save();
         }
+        return response()->json([
+            'success' => true,
+            'message' => 'attended',
+            'record' => $rec
+            ], 200);
     }
 
     public function edit_record(Request $r, $id)
