@@ -39,6 +39,7 @@ Route::prefix('lecturer')->group(function () {
 });
 
 Route::post('announcement', 'App\Http\Controllers\Api\AnnouncementController@store');
+Route::post('assignment', 'App\Http\Controllers\Api\AssignmentController@store');
 Route::get('announcement/type', 'App\Http\Controllers\Api\AnnouncementController@announcementType');
 
 // For all user can view Announcement

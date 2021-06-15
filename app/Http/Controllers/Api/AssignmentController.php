@@ -30,7 +30,30 @@ class AssignmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $now = date('Y-m-d H:i:s');
+        $assignment = new Assignment();
+        $assignment->announcement_type = 6;
+        $assignment->subject_class = $request->subject_class;
+        $assignment->title = $request->title;
+        $assignment->description = $request->description;
+        if($request->deadline != '') {
+            $assignment->deadline = date('Y-m-d H:i:s', strtotime($request->deadline));
+        } else {
+            $assignment->deadline = $now;
+        }
+        $assignment->create_date = $now;
+        if($assignment->save()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'create new assignment succesful'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'create new assignment failed'
+        ]);
+
     }
 
     /**
