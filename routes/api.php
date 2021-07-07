@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Record\RecordController;
 use App\Http\Controllers\Api\Lecturer\SubjecClassController;
 use App\Http\Controllers\Api\Lecturer\AnnouncementController as LecturerAnnouncementController;
 use App\Http\Controllers\Api\Lecturer\LecturerController;
+use App\Http\Controllers\Api\Parent\LoginController;
 use App\Http\Controllers\Grade\GradeController;
 
 /*
@@ -30,6 +31,8 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
 
 header("Access-Control-Allow-Headers: X-Requested-With");
+
+Route::resource('parent/login', LoginController::class);
 
 Route::prefix('lecturer')->group(function () {
     Route::get('subject-class/class_list', [SubjecClassController::class, 'getSubjectClassofLecturer']);
