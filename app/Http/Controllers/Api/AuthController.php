@@ -24,18 +24,28 @@ use DB;
 
 class AuthController extends Controller
 {
-    public function login(Request $req)
+    public function login(Request $request)
     {
-
         // return 9;
-        $account = Account::where(['username' => $req->username, 'password' => ($req->password)])->first();
+        $account = Account::where([
+            'username' => $request->username,
+            'password' => md5($request->password)
+        ])->first();
+
+        // return response()->json([
+        //     'account' => $account,
+        //     'username' => $request->username,
+        //     'password' => $request->password
+        // ]);
+
         // return $account;
         Auth::login($account);
 
         $student = null;
         $lecturer = null;
         $parent = null;
-        $role = Account_Role::where('account_id', Auth::user()->account_id)->first()->role_id;
+        $role = Account_Role::where('account_id', $account->account_id)->first()->role_id;
+
         if ($role == 1) {
             $student = Student::where('account_id', $account->account_id)->first();
             $student->class = Class_List::find($student->class_id)->class_name;
@@ -44,18 +54,18 @@ class AuthController extends Controller
             $lecturer->degree = Lecturer_Degree_Type::find($lecturer->degree)->degree_type_name;
             $lecturer->faculty = Faculty::find($lecturer->faculty_id)->faculty_name;
         } else if ($role == 3) {
-
             $parent = Parents::where('account_id', $account->account_id)->first();
-            $child = ParentStudent::where('parent_id', $parent->parent_id)->first();
-            $student = Student::find($child->student_id);
+            $student = Student::join('parent_of_student', 'student.student_id', 'parent_of_student.student_id')
+                ->where('parent_id', $parent->parent_id)
+                ->select('student.*')
+                ->get();
         }
-
         return response()->json([
             'success' => true,
             'role' => $role,
-            'parent' => $parent,
             'student' => $student,
             'lecturer' => $lecturer,
+            'parent' => $parent
         ]);
     }
 
