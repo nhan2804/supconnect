@@ -77,66 +77,88 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
+        /**
+         * Get the student that processing the transaction
+         */
         $student = Student::where('account_id', $request->acc_id)->first();
-
+        /**
+         * Get the balance of the account
+         */
         $acc_balance = Account_Balance::where('account_id', $request->acc_id)->first();
 
+        /**
+         * Prepare new record for `Transaction_history`
+         */
         $newPayment = new Payment;
         $newPayment->user_id = $student->student_id;
         $newPayment->transaction_type_id = $request->type;
         $newPayment->date = date('Y-m-d h:i:s');
         $newPayment->amount = $request->amount;
-        $newPayment->transaction_category = $request->category ? $request->category : null;
-        $newPayment->description = $request->description ? $request->description : "";
-        $newPayment->save();
 
+        /**
+         * store old balance
+         */
         $oldBalance = $acc_balance->balance;
 
+        /**
+         * Update the new Balance
+         */
         $newBalance = 0;
+        // recharge
         if ($newPayment->transaction_type_id == 1) {
             $newBalance = $oldBalance + $newPayment->amount;
         }
+        // withdraw
         if ($newPayment->transaction_type_id == 2) {
             $newBalance = $oldBalance - $newPayment->amount;
 
-            if($oldBalance < $newPayment->amount) {
+            if ($oldBalance < $newPayment->amount) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Số dư của bạn không đủ'
                 ]);
             }
-
         }
-        $id_trans
-            = DB::getPdo()->lastInsertId();
-        $detail = new PaymentDetail();
-        $detail->amount = $newPayment->amount;
-        $detail->description = $request->description;
-        $detail->transaction_history_id = $id_trans;
-        $detail->transaction_category_id = $request->category_id;
+
+        $id_trans = DB::getPdo()->lastInsertId();
 
         $acc_balance->balance = $newBalance;
 
-
+        /**
+         * Get the payment category
+         */
         $paymentCate = PaymentCategory::find($request->category);
 
+        /**
+         * If the payment history and account's balance is updated successfully,
+         * then create the new `transaction_history_detail` of that record,
+         * then response. Otherwise return 500 err
+         */
         if ($newPayment->save() && $acc_balance->update([
-
             'amount' => $newBalance
-        ]))
+        ])) {
+
+            $detail = new PaymentDetail();
+            $detail->amount = $newPayment->amount;
+            $detail->description = $request->description;
+            $detail->transaction_history_id = $newPayment->transaction_history_id;
+            $detail->transaction_category_id = $request->category;
+
+            $detail->save();
             return response()->json([
                 'success' => true,
                 'type' => $paymentCate->transaction_category_name,
                 'department' => Department::find($paymentCate->department_id)->department_name,
                 'date' => $newPayment->date,
-                'message' => 'Giao dịch thành công'
-
+                'message' => 'Giao dịch thành công',
+                'detail' => $detail
             ], 200);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Giao dịch thất bại'
-        ], 500);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Giao dịch thất bại'
+            ], 500);
+        }
     }
 
     /**
