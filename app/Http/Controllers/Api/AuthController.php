@@ -24,14 +24,16 @@ use DB;
 
 class AuthController extends Controller
 {
-    public function login(Request $req)
+    public function login(Request $request)
     {
+
 
         // return Auth::user();
         $account = Account::where(['username' => $req->username, 'password' => md5($req->password)])->first();
-
         $student = null;
         $lecturer = null;
+        $parent = null;
+        Auth::login($account)
         $role = Account_Role::where('account_id', $account->account_id)->first()->role_id;
 
         if ($role == 1) {
@@ -42,18 +44,19 @@ class AuthController extends Controller
             $lecturer->degree = Lecturer_Degree_Type::find($lecturer->degree)->degree_type_name;
             $lecturer->faculty = Faculty::find($lecturer->faculty_id)->faculty_name;
         } else if ($role == 3) {
-
             $parent = Parents::where('account_id', $account->account_id)->first();
-            $child = ParentStudent::where('parent_id', $parent->parent_id)->first();
-            $student = Student::find($child->student_id);
+            $student = Student::join('parent_of_student', 'student.student_id', 'parent_of_student.student_id')
+                ->where('parent_id', $parent->parent_id)
+                ->select('student.*')
+                ->get();
         }
-
         return response()->json([
             'success' => true,
             'role' => $role,
             'password' => md5($req->password),
             'student' => $student,
             'lecturer' => $lecturer,
+            'parent' => $parent
         ]);
     }
 

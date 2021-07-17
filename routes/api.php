@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Lecturer\AnnouncementController as LecturerAnnounce
 use App\Http\Controllers\Api\Lecturer\LecturerController;
 use App\Http\Controllers\Api\Parent\LoginController;
 use App\Http\Controllers\Grade\GradeController;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,7 +76,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 
 
-Route::post('login', 'App\Http\Controllers\Api\AuthController@login');
+Route::get('/login', [AuthController::class, 'login']);
 Route::get('/logout', 'App\Http\Controllers\Api\AuthController@logout');
 
 Route::prefix('student')->group(function () {
