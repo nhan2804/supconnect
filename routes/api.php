@@ -59,6 +59,7 @@ Route::resource('payment', PaymentController::class);
 // extra route to get details of the paymet
 Route::get('paymentdetail', [PaymentController::class, 'detail']);
 
+
 Route::resource('record', RecordController::class);
 
 Route::resource('lecturer', LecturerController::class);
