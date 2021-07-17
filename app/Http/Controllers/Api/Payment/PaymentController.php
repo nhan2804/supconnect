@@ -31,13 +31,13 @@ class PaymentController extends Controller
             if ($payment->transaction_type_id == 2) {
                 $payment->type_name = $this->getCateName($payment);
             }
-            $payment->amount = number_format($payment->amount,0,",",".");
+            $payment->amount = number_format($payment->amount, 0, ",", ".");
         }
 
         return response()->json([
             'success' => true,
-            'balance' => number_format($balance,0,",","."),
-            'student_name' => $student->first_name.' '.$student->last_name,
+            'balance' => number_format($balance, 0, ",", "."),
+            'student_name' => $student->first_name . ' ' . $student->last_name,
             'student_id' => $student->student_id,
             'payments' => $payments
         ], 200);
@@ -93,23 +93,35 @@ class PaymentController extends Controller
         $oldBalance = $acc_balance->balance;
 
         $newBalance = 0;
-        if($newPayment->transaction_type_id == 1) {
+        if ($newPayment->transaction_type_id == 1) {
             $newBalance = $oldBalance + $newPayment->amount;
         }
-        if($newPayment->transaction_type_id == 2) {
+        if ($newPayment->transaction_type_id == 2) {
             $newBalance = $oldBalance - $newPayment->amount;
+
             if($oldBalance < $newPayment->amount) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Số dư của bạn không đủ'
                 ]);
             }
+
         }
+        $id_trans
+            = DB::getPdo()->lastInsertId();
+        $detail = new PaymentDetail();
+        $detail->amount = $newPayment->amount;
+        $detail->description = $request->description;
+        $detail->transaction_history_id = $id_trans;
+        $detail->transaction_category_id = $request->category_id;
+
         $acc_balance->balance = $newBalance;
+
 
         $paymentCate = PaymentCategory::find($request->category);
 
         if ($newPayment->save() && $acc_balance->update([
+
             'amount' => $newBalance
         ]))
             return response()->json([
@@ -118,6 +130,7 @@ class PaymentController extends Controller
                 'department' => Department::find($paymentCate->department_id)->department_name,
                 'date' => $newPayment->date,
                 'message' => 'Giao dịch thành công'
+
             ], 200);
 
         return response()->json([

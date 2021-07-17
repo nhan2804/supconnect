@@ -16,6 +16,8 @@ use App\Models\Account_Role;
 use App\Models\Class_List;
 use App\Models\User;
 use App\Models\Faculty;
+use App\Models\Parent\Parents;
+use App\Models\Parent\ParentStudent;
 use Session;
 use DB;
 
@@ -24,19 +26,26 @@ class AuthController extends Controller
 {
     public function login(Request $req)
     {
+
         // return Auth::user();
         $account = Account::where(['username' => $req->username, 'password' => md5($req->password)])->first();
 
         $student = null;
         $lecturer = null;
         $role = Account_Role::where('account_id', $account->account_id)->first()->role_id;
+
         if ($role == 1) {
             $student = Student::where('account_id', $account->account_id)->first();
             $student->class = Class_List::find($student->class_id)->class_name;
-        } else if($role == 2) {
+        } else if ($role == 2) {
             $lecturer = Lecturer::where('account_id', $account->account_id)->first();
             $lecturer->degree = Lecturer_Degree_Type::find($lecturer->degree)->degree_type_name;
             $lecturer->faculty = Faculty::find($lecturer->faculty_id)->faculty_name;
+        } else if ($role == 3) {
+
+            $parent = Parents::where('account_id', $account->account_id)->first();
+            $child = ParentStudent::where('parent_id', $parent->parent_id)->first();
+            $student = Student::find($child->student_id);
         }
 
         return response()->json([
@@ -48,7 +57,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout() {
+    public function logout()
+    {
         Auth::logout();
         return response()->json([
             'success' => true,
