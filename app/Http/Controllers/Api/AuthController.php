@@ -27,7 +27,6 @@ class AuthController extends Controller
     public function login(Request $request)
     {
 
-
         // return Auth::user();
         $account = Account::where(['username' => $request->username, 'password' => md5($request->password)])->first();
         $student = null;
@@ -48,7 +47,7 @@ class AuthController extends Controller
             $student = Student::join('parent_of_student', 'student.student_id', 'parent_of_student.student_id')
                 ->where('parent_id', $parent->parent_id)
                 ->select('student.*')
-                ->get();
+                ->first();
         }
         return response()->json([
             'success' => true,
