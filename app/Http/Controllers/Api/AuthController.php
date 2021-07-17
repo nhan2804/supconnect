@@ -29,11 +29,11 @@ class AuthController extends Controller
 
 
         // return Auth::user();
-        $account = Account::where(['username' => $req->username, 'password' => md5($req->password)])->first();
+        $account = Account::where(['username' => $request->username, 'password' => md5($request->password)])->first();
         $student = null;
         $lecturer = null;
         $parent = null;
-        Auth::login($account)
+        Auth::login($account); 
         $role = Account_Role::where('account_id', $account->account_id)->first()->role_id;
 
         if ($role == 1) {
@@ -53,7 +53,7 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'role' => $role,
-            'password' => md5($req->password),
+            'password' => md5($request->password),
             'student' => $student,
             'lecturer' => $lecturer,
             'parent' => $parent
