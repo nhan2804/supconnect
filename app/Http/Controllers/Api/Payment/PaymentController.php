@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Account_Balance;
 use App\Models\Payment\Payment;
 use App\Models\Payment\PaymentDetail;
+use App\Models\PaymentCategory;
 use App\Models\Student;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -96,21 +98,31 @@ class PaymentController extends Controller
         }
         if($newPayment->transaction_type_id == 2) {
             $newBalance = $oldBalance - $newPayment->amount;
+            if($oldBalance < $newPayment->amount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Số dư của bạn không đủ'
+                ]);
+            }
         }
         $acc_balance->balance = $newBalance;
 
-        if ($newDetail->save() && $acc_balance->update([
+        $paymentCate = PaymentCategory::find($request->category);
+
+        if ($newPayment->save() && $acc_balance->update([
             'amount' => $newBalance
         ]))
             return response()->json([
                 'success' => true,
-                'payment' => $newPayment,
-                'detail' => $newDetail,
-                'balance' => $acc_balance
+                'type' => $paymentCate->transaction_category_name,
+                'department' => Department::find($paymentCate->department_id)->department_name,
+                'date' => $newPayment->date,
+                'message' => 'Giao dịch thành công'
             ], 200);
 
         return response()->json([
-            'success' => "false"
+            'success' => false,
+            'message' => 'Giao dịch thất bại'
         ], 500);
     }
 
