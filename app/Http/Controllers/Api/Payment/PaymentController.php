@@ -26,10 +26,13 @@ class PaymentController extends Controller
         $balance = Account_Balance::where('account_id', $student->account_id)->first()->balance;
         $payments = Payment::where('user_id', $request->student_id)->get();
         foreach ($payments as $payment) {
-            $payment->type_name = DB::table('transaction_type')
-                ->where('transaction_type_id', $payment->transaction_type_id)->first()->transaction_type_name;
+            $typeName = DB::table('transaction_type')
+                ->where('transaction_type_id', $payment->transaction_type_id)
+                ->first()
+                ->transaction_type_name;
+            $payment->type_name = $typeName ? $typeName : "khác";
             if ($payment->transaction_type_id == 2) {
-                $payment->type_name = $this->getCateName($payment);
+                $payment->type_name = $this->getCateName($payment->transaction_history_id);
             }
             $payment->amount = number_format($payment->amount, 0, ",", ".");
         }
@@ -43,10 +46,14 @@ class PaymentController extends Controller
         ], 200);
     }
 
-    private function getCateName($payment)
+    private function getCateName($paymentID)
     {
+        $detail = PaymentDetail::where('transaction_history_id', $paymentID)
+            ->first();
+            
         $name = DB::table('transaction_category')
-            ->where('transaction_category_id', $payment->transaction_category)->pluck('transaction_category_name')[0];
+            ->where('transaction_category_id', $detail->transaction_category_id)
+            ->pluck('transaction_category_name')[0];
         return  $name;
     }
 
