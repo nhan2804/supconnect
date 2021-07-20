@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Lecturer;
 
 use App\Http\Controllers\Controller;
+use App\Models\Faculty;
 use App\Models\Lecturer;
 use App\Models\Lecturer_Degree_Type;
 use App\Models\Student;
@@ -30,11 +31,15 @@ class LecturerController extends Controller
                                 ->get();
 
         foreach ($lecturers as $lecturer){
+            $lecturer->faculty = 'Khoa '.Faculty::find($lecturer->faculty_id)->faculty_name;
+            $lecturer->degree_name = Lecturer_Degree_Type::find($lecturer->degree)->degree_type_name;
             $lecturer->degree = Lecturer_Degree_Type::find($lecturer->degree)->abbreviation;
             $lecturer->name = $lecturer->degree.''.$lecturer->first_name_lecturer.' '.$lecturer->last_name_lecturer;
         }
 
         foreach($class_lecturers as $class_lecturer){
+            $class_lecturer->faculty = 'Khoa '.Faculty::find($class_lecturer->faculty_id)->faculty_name;
+            $class_lecturer->degree_name = Lecturer_Degree_Type::find($class_lecturer->degree)->degree_type_name;
             $class_lecturer->degree = Lecturer_Degree_Type::find($class_lecturer->degree)->abbreviation;
             $class_lecturer->name = $class_lecturer->degree.''.$class_lecturer->first_name_lecturer.' '.$class_lecturer->last_name_lecturer;
         }

@@ -69,7 +69,7 @@ class StudentController extends Controller
             ->where('subject_class.semester', $req->semester)
             ->where('subject_class.school_year', $req->school_year)
             ->where('student_id', $student_id)
-            ->select('student_of_subject_class.junction_id', 'student_of_subject_class.subject_class', 'subject_class.subject_id')
+            ->select('student_of_subject_class.junction_id', 'student_of_subject_class.subject_class', 'subject_class.subject_id', 'subject_class.subject_class_name')
             ->get();
         }
         $marks = [];
@@ -91,6 +91,10 @@ class StudentController extends Controller
             $lecturer = Subject_Class::find($class->subject_class)->lecturer_id;
             $class->lecturer = $lecturer;
 
+            $subject_id = Subject_Class::find($class->subject_class)->subject_id;
+            $class_name = Subject_List::find($subject_id)->subject_name;
+            $class->class_name = $class_name;
+            
             foreach($grades as $grade) {
                 if($grade->subject_class == $class->subject_class) {
                     if($grade->grade_type == 1) {
@@ -145,7 +149,7 @@ class StudentController extends Controller
             ->where('student_of_subject_class.student_id', $student_id)
             ->where('subject_class.date_start', '<=', $now)
             ->where('subject_class.date_end', '>=', $now)
-            ->select('student_of_subject_class.subject_class', 'subject_class.subject_class_name')
+            ->select('subject_class.subject_class_name', 'student_of_subject_class.subject_class')
             ->get();
 
         return response()->json([
