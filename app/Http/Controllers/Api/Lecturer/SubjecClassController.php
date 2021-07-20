@@ -9,6 +9,8 @@ use App\Models\Subject_Class;
 use App\Models\Subject_List;
 use App\Models\Student;
 use App\Models\TimeTable;
+use App\Models\Class_List;
+use App\Models\Student_Of_Subject_Class;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -220,5 +222,34 @@ class SubjecClassController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getStudentsOfClass($class_id) {
+        $students = Student_Of_Subject_Class::where('subject_class', $class_id)
+                        ->join('student', 'student.student_id', 'student_of_subject_class.student_id')
+                        ->select('student.student_id', 'student.first_name', 'student.last_name', 'student.class_id')
+                        ->get();
+        foreach($students as $student) {
+            $student->student_name = $student->first_name .' ' .$student->last_name;
+            $student->class_name = Class_List::find($student->class_id)->class_name;
+            $student->subject_class_id = $class_id;
+            $student->checkRollUp = false;
+            $student->avatar = Student::find($student->student_id)->avatar;
+            unset($student->first_name);
+            unset($student->last_name);
+            unset($student->class_id);
+        }
+        
+        if($students) {
+            return response()->json([
+                'success' => true,
+                'students' => $students
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'students' => []
+        ]);
+
     }
 }

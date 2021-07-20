@@ -37,6 +37,7 @@ Route::resource('parent/login', LoginController::class);
 
 Route::prefix('lecturer')->group(function () {
     Route::get('subject-class/class_list', [SubjecClassController::class, 'getSubjectClassofLecturer']);
+    Route::get('subject-class/{class_id}/students', [SubjecClassController::class, 'getStudentsOfClass']);
     Route::resource('/', LecturerController::class);
     Route::resource('subject-class', SubjecClassController::class);
     Route::put('subject-class/edit-record/{id}', [SubjecClassController::class, 'edit_record']);
