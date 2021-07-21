@@ -112,48 +112,53 @@ class SubjecClassController extends Controller
         // DB::enableQueryLog();
         $students = DB::table('subject_class')
             ->where('subject_class.subject_class_id', $id)
-            ->where('lecturer_id', 'GVCS002')
             ->join('student_of_subject_class', 'student_of_subject_class.subject_class', 'subject_class.subject_class_id')
             ->join('student', 'student.student_id', 'student_of_subject_class.student_id')
+            ->select('student.*')
             ->get();
+       
         // $sb = Subject_Class::where('subject_class_id', $id)->where('lecturer_id', 'GVCS002')->first();
-        $check = DB::table('subject_class')
-            ->where('subject_class.subject_class_id', $id)
-            ->where('lecturer_id', 'GVCS002')
-            ->join('roll_call_record', 'roll_call_record.subject_class', 'subject_class.subject_class_id')
-            ->where('date', $now)->first();
+        $record = Record::whereDate('date', $now)->where('subject_class', $id)->first();
+       
         //check xem đã vào điểm danh chưa
-        if (!$check) {
-            $n = new Record;
-            $n->date = $now;
-            $n->subject_class = $id;
-            $n->lesson = 1;
-            $n->number_of_attendants = count($students);
-            $n->save();
+        if (!$record) {
+            $record = new Record;
+            $record->date = $now;
+            $record->subject_class = $id;
+            $record->lesson = 1;
+            $record->number_of_attendants = count($students);
+            $record->save();
             $id_record = DB::getPdo()->lastInsertId();
             foreach ($students as $k => $v) {
-                $n = new RecordDetail;
-                $n->record_id
-                    = $id_record;
-                $n->student_id = $v->student_id;
-                $n->is_attend = 1;
-                $n->leave_of_absence_letter = 1;
-                $n->reason = 1;
-                $n->save();
+                $record = new RecordDetail;
+                $record->record_id = $id_record;
+                $record->student_id = $v->student_id;
+                $record->is_attend = 1;
+                $record->leave_of_absence_letter = 1;
+                $record->reason = 1;
+                $record->save();
             }
         }
 
-        $students = DB::table('subject_class')->where('subject_class.subject_class_id', $id)->where('lecturer_id', 'GVCS002')
-            ->whereDate('date_start', '<=', $now)
-            ->whereDate('date_end', '>=', $now)
-            ->join('student_of_subject_class', 'student_of_subject_class.subject_class', 'subject_class.subject_class_id')
-            ->join('student', 'student.student_id', 'student_of_subject_class.student_id')
-            ->join('roll_call_record_detail', 'student.student_id', 'roll_call_record_detail.student_id')
-            ->join('class_list', 'class_list.class_id' ,'student.class_id')
-            ->join('roll_call_record', 'roll_call_record.record_id' ,'roll_call_record_detail.record_id')
-            ->where('roll_call_record.date', $r->date)
-            ->select('student.*', 'roll_call_record_detail.record_detail_id', 'roll_call_record_detail.is_attend','class_list.class_name')
-            ->get();
+        foreach($students as $student) {
+            $student->class_name = Class_List::find($student->class_id)->class_name;
+            $student->is_attend = 1;
+            $student->record_detail_id = $record->record_id;
+        }
+
+        
+
+        // $students = DB::table('subject_class')->where('subject_class.subject_class_id', $id)->where('lecturer_id', 'GVCS002')
+        //     ->whereDate('date_start', '<=', $now)
+        //     ->whereDate('date_end', '>=', $now)
+        //     ->join('student_of_subject_class', 'student_of_subject_class.subject_class', 'subject_class.subject_class_id')
+        //     ->join('student', 'student.student_id', 'student_of_subject_class.student_id')
+        //     ->join('roll_call_record_detail', 'student.student_id', 'roll_call_record_detail.student_id')
+        //     ->join('class_list', 'class_list.class_id' ,'student.class_id')
+        //     ->join('roll_call_record', 'roll_call_record.record_id' ,'roll_call_record_detail.record_id')
+        //     ->where('roll_call_record.date', $r->date)
+        //     ->select('student.*', 'roll_call_record_detail.record_detail_id', 'roll_call_record_detail.is_attend','class_list.class_name')
+        //     ->get();
         $subject_class = Subject_Class::where('subject_class_id', $id)->first();
 
         return response()->json([
