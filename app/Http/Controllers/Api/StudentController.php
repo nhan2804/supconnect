@@ -72,9 +72,14 @@ class StudentController extends Controller
             ->select('student_of_subject_class.junction_id', 'student_of_subject_class.subject_class', 'subject_class.subject_id', 'subject_class.subject_class_name')
             ->get();
         }
+        if(!$subjectResults) {
+            return response()->json([
+                'success' => false,
+                'subjectResults' => []
+            ]);
+        }
         $marks = [];
         foreach($subjectResults as $class) {
-
             $grades = Grade_Book::join('grade_book_detail', 'grade_book_detail.grade_book_id', 'grade_book.grade_book_id')
                         ->where('grade_book_detail.student_id', $student_id)
                         ->select('grade_book_detail.grade_book_detail_id', 'grade_book.grade_type' ,'grade_book_detail.grade', 'grade_book.grade_weight', 'grade_book.subject_class')
@@ -121,7 +126,6 @@ class StudentController extends Controller
             } else {
                 $class->point_word = 'F';
             }
-
         }
 
         return response()->json([
