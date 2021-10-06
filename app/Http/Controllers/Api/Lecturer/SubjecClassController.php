@@ -148,6 +148,7 @@ class SubjecClassController extends Controller
             // ref đến dòng 118, dùng để lấy lớp sinh hoạt sinh viên nên bỏ, k truy vấn lấy lại
             // $student->class_name = Class_List::find($student->class_id)->class_name;
             // $student->is_attend = 1;
+            // chỗ này định bỏ luôn vì k biết lấy record_detail_id để làm gì
             $student->record_detail_id = $record->record_id;
         }
 
