@@ -25,11 +25,11 @@ class SubjecClassController extends Controller
     {
         $now = date('Y-m-d');
         $subjects = TimeTable::join('subject_class', 'subject_class.subject_class_id', 'timetable.subject_class_id')
-        ->where('subject_class.lecturer_id', $req->lecturer_id)
-        ->where('subject_class.date_start', '<=', $now)
-        ->where('subject_class.date_end', '>=', $now)
-        ->get();
-        if($subjects->count() == 0) {
+            ->where('subject_class.lecturer_id', $req->lecturer_id)
+            ->where('subject_class.date_start', '<=', $now)
+            ->where('subject_class.date_end', '>=', $now)
+            ->get();
+        if ($subjects->count() == 0) {
             return response()->json([
                 'success' => false,
                 'timetables' => $subjects
@@ -40,35 +40,35 @@ class SubjecClassController extends Controller
             'timetables' => $subjects
         ]);
     }
-    public function getSubjectClassofLecturer(Request $request){
+    public function getSubjectClassofLecturer(Request $request)
+    {
         $now = date('Y-m-d');
         $subject_lists = SUbject_List::all();
-        if($request->semester == '' || $request->school_year == '') {
-            foreach($subject_lists as $key => $subject_list){
-                $subject_list->subject_classes = Subject_Class::where('lecturer_id',$request->lecturer_id)
-                ->where('subject_id', $subject_list->subject_id)
-                ->where('date_start', '<=', $now)
-                ->where('date_end', '>=', $now)
-                ->get();
-                if($subject_list->subject_classes->count()==0){
+        if ($request->semester == '' || $request->school_year == '') {
+            foreach ($subject_lists as $key => $subject_list) {
+                $subject_list->subject_classes = Subject_Class::where('lecturer_id', $request->lecturer_id)
+                    ->where('subject_id', $subject_list->subject_id)
+                    ->where('date_start', '<=', $now)
+                    ->where('date_end', '>=', $now)
+                    ->get();
+                if ($subject_list->subject_classes->count() == 0) {
                     unset($subject_lists[$key]);
                 }
             }
-        }
-        else{
-            foreach($subject_lists as $key => $subject_list){
-                $subject_list->subject_classes = Subject_Class::where('lecturer_id',$request->lecturer_id)
-                ->where('subject_id', $subject_list->subject_id)
-                ->where('semester', $request->semester)
-                ->where('school_year', $request->school_year)
-                ->get();
-                if($subject_list->subject_classes->count()==0){
+        } else {
+            foreach ($subject_lists as $key => $subject_list) {
+                $subject_list->subject_classes = Subject_Class::where('lecturer_id', $request->lecturer_id)
+                    ->where('subject_id', $subject_list->subject_id)
+                    ->where('semester', $request->semester)
+                    ->where('school_year', $request->school_year)
+                    ->get();
+                if ($subject_list->subject_classes->count() == 0) {
                     unset($subject_lists[$key]);
                 }
             }
         }
         $arr = [];
-        foreach($subject_lists as $subject) {
+        foreach ($subject_lists as $subject) {
             array_push($arr, $subject);
         }
         return response()->json([
@@ -104,49 +104,53 @@ class SubjecClassController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id, Request $r)
+    public function show($id_subject_class, Request $r)
     {
         $now = date('Y-m-d');
         if ($r->date) $now = $r->date;
 
         // DB::enableQueryLog();
         $students = DB::table('subject_class')
-            ->where('subject_class.subject_class_id', $id)
+            ->where('subject_class.subject_class_id', $id_subject_class)
             ->join('student_of_subject_class', 'student_of_subject_class.subject_class', 'subject_class.subject_class_id')
             ->join('student', 'student.student_id', 'student_of_subject_class.student_id')
-            ->select('student.*')
+            // dòng này dùng để lấy ra lớp sv đang sinh hoạt
+            ->join("class_list", 'student.class_id', 'class_list.class_id')
+            ->select('student.*', 'class_list.*')
+
             ->get();
-       
+
         // $sb = Subject_Class::where('subject_class_id', $id)->where('lecturer_id', 'GVCS002')->first();
-        $record = Record::whereDate('date', $now)->where('subject_class', $id)->first();
-       
+        $record = Record::whereDate('date', $now)->where('subject_class', $id_subject_class)->first();
+
         //check xem đã vào điểm danh chưa
         if (!$record) {
             $record = new Record;
             $record->date = $now;
-            $record->subject_class = $id;
+            $record->subject_class = $id_subject_class;
             $record->lesson = 1;
-            $record->number_of_attendants = count($students);
+            $record->number_of_attendants = 0;
             $record->save();
             $id_record = DB::getPdo()->lastInsertId();
             foreach ($students as $k => $v) {
                 $record = new RecordDetail;
                 $record->record_id = $id_record;
                 $record->student_id = $v->student_id;
-                $record->is_attend = 1;
-                $record->leave_of_absence_letter = 1;
-                $record->reason = 1;
+                $record->is_attend = 0;
+                $record->leave_of_absence_letter = 0;
+                $record->reason = 0;
                 $record->save();
             }
         }
 
-        foreach($students as $student) {
-            $student->class_name = Class_List::find($student->class_id)->class_name;
-            $student->is_attend = 1;
+
+        foreach ($students as $student) {
+            // ref đến dòng 118, dùng để lấy lớp sinh hoạt sinh viên nên bỏ, k truy vấn lấy lại
+            // $student->class_name = Class_List::find($student->class_id)->class_name;
+            // $student->is_attend = 1;
+            // chỗ này định bỏ luôn vì k biết lấy record_detail_id để làm gì
             $student->record_detail_id = $record->record_id;
         }
-
-        
 
         // $students = DB::table('subject_class')->where('subject_class.subject_class_id', $id)->where('lecturer_id', 'GVCS002')
         //     ->whereDate('date_start', '<=', $now)
@@ -159,15 +163,15 @@ class SubjecClassController extends Controller
         //     ->where('roll_call_record.date', $r->date)
         //     ->select('student.*', 'roll_call_record_detail.record_detail_id', 'roll_call_record_detail.is_attend','class_list.class_name')
         //     ->get();
-        $subject_class = Subject_Class::where('subject_class_id', $id)->first();
+        $subject_class = Subject_Class::where('subject_class_id', $id_subject_class)->first();
 
         return response()->json([
-            'success'=>true,
-            'subject_class'=>$subject_class->subject_class_name,
-            'semeter'=>$subject_class->semester,
-            'year'=> explode('-',$now)[0],
-            'date'=> $now,
-            'students'=>$students,
+            'success' => true,
+            'subject_class' => $subject_class->subject_class_name,
+            'semeter' => $subject_class->semester,
+            'year' => explode('-', $now)[0],
+            'date' => $now,
+            'students' => $students,
         ], 200);
         // dd(DB::getQueryLog());
         // return $list_std =
@@ -194,20 +198,23 @@ class SubjecClassController extends Controller
     public function update(Request $r, $id)
     {
         $rec = RecordDetail::findOrFail($id);
-        if($r->cardID == '' || $r->cardID == null) {
+        $record = Record::find($rec->record_id);
+        if ($r->cardID == '' || $r->cardID == null) {
             $is = $rec->is_attend == 1 ? 0 : 1;
             $rec->is_attend = $is;
             $rec->save();
-            
         } else {
             $rec->is_attend = 1;
             $rec->save();
+            // nếu sinh viên quét card điểm danh thì set lại sv có mặt lên +1
+            $record->number_of_attendants = $record->number_of_attendants++;
+            $record->save();
         }
         return response()->json([
             'success' => true,
             'message' => 'attended',
             'record' => $rec
-            ], 200);
+        ], 200);
     }
 
     public function edit_record(Request $r, $id)
@@ -229,13 +236,15 @@ class SubjecClassController extends Controller
         //
     }
 
-    public function getStudentsOfClass($class_id) {
+    public function getStudentsOfClass($class_id)
+    {
         $students = Student_Of_Subject_Class::where('subject_class', $class_id)
-                        ->join('student', 'student.student_id', 'student_of_subject_class.student_id')
-                        ->select('student.student_id', 'student.first_name', 'student.last_name', 'student.class_id')
-                        ->get();
-        foreach($students as $student) {
-            $student->student_name = $student->first_name .' ' .$student->last_name;
+            ->join('student', 'student.student_id', 'student_of_subject_class.student_id')
+            ->select('student.student_id', 'student.first_name', 'student.last_name', 'student.class_id')
+            ->get();
+        // đoạn này của Phong tôi k rõ, nhưng để foreach mà truy vấn như vậy rất ngốn, nếu có gì đổi đc data từ api trả về thì alo tôi sửa lại
+        foreach ($students as $student) {
+            $student->student_name = $student->first_name . ' ' . $student->last_name;
             $student->class_name = Class_List::find($student->class_id)->class_name;
             $student->subject_class_id = $class_id;
             $student->checkRollUp = false;
@@ -244,8 +253,8 @@ class SubjecClassController extends Controller
             unset($student->last_name);
             unset($student->class_id);
         }
-        
-        if($students) {
+
+        if ($students) {
             return response()->json([
                 'success' => true,
                 'students' => $students
@@ -255,6 +264,5 @@ class SubjecClassController extends Controller
             'success' => false,
             'students' => []
         ]);
-
     }
 }
